@@ -23,6 +23,7 @@ class FetchLatestSeismicData implements ShouldQueue
             $result = $ingest->ingest(
                 (string) config('seismo.usgs_live_feed_url'),
                 timeoutSeconds: 30,
+                broadcast: true,
             );
 
             if (! $result->successful) {

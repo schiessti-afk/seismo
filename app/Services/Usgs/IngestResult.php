@@ -10,5 +10,6 @@ final class IngestResult
         public readonly bool $successful,
         public readonly int $upserted,
         public readonly int $skipped,
+        public readonly int $broadcasts = 0,
     ) {}
 }

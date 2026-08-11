@@ -108,13 +108,13 @@ Push live updates to browsers for qualifying events only.
 
 ### Work
 
-- [ ] `EarthquakeDetected` event (`ShouldBroadcast`) on public channel `earthquakes`
-- [ ] Emit only on insert or material field change **and** magnitude ≥ `SEISMO_BROADCAST_MIN_MAGNITUDE` (2.5)
-- [ ] Payload: map-ready DTO (id, mag, lat, lon, depth, place, occurred_at, tsunami)
-- [ ] Backfill path never broadcasts
-- [ ] Echo + Reverb client config in Vite/Laravel
-- [ ] Pest: assert broadcast / `Event::fake` for M≥2.5 insert; assert no broadcast for M&lt;2.5 and no-op upsert
-- [ ] Manual smoke: two browsers receive the same test broadcast
+- [x] `EarthquakeDetected` event (`ShouldBroadcast`) on public channel `earthquakes`
+- [x] Emit only on insert or material field change **and** magnitude ≥ `SEISMO_BROADCAST_MIN_MAGNITUDE` (2.5)
+- [x] Payload: map-ready DTO (id, mag, lat, lon, depth, place, occurred_at, tsunami)
+- [x] Backfill path never broadcasts
+- [x] Echo + Reverb client config in Vite/Laravel
+- [x] Pest: assert broadcast / `Event::fake` for M≥2.5 insert; assert no broadcast for M&lt;2.5 and no-op upsert
+- [x] Manual smoke: two browsers receive the same test broadcast
 
 ### Exit criteria
 

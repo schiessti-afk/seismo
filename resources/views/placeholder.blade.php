@@ -52,12 +52,20 @@
                 font-size: 1rem;
                 letter-spacing: 0.04em;
             }
+
+            .ws-hint {
+                margin: 1.5rem 0 0;
+                color: var(--seismo-muted);
+                font-size: 0.85rem;
+                letter-spacing: 0.02em;
+            }
         </style>
     </head>
     <body>
         <main>
             <h1 class="brand">SEISMO</h1>
             <p class="tagline">{{ __('seismo.placeholder_tagline') }}</p>
+            <p class="ws-hint">{{ __('seismo.ws_smoke_hint') }}</p>
         </main>
         @livewireScripts
     </body>

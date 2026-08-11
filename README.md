@@ -2,7 +2,7 @@
 
 Self-hosted real-time seismic monitoring: USGS GeoJSON → PostgreSQL/PostGIS → Laravel Horizon → Reverb WebSockets → public Livewire + Leaflet map.
 
-> **Status:** Sprint 2 complete — USGS ingest via Horizon jobs (`BackfillSeismicData`, `FetchLatestSeismicData`), idempotent upserts, auto-retry backfill marker, and Pest coverage. Realtime broadcasting lands in Sprint 3.
+> **Status:** Sprint 3 complete — `EarthquakeDetected` on public Reverb channel `earthquakes` for live M≥2.5 inserts/material changes; backfill stays silent; Echo smoke + Pest gate coverage. Live UI shell lands in Sprint 4.
 
 ---
 
@@ -122,6 +122,15 @@ Supervisor inside the app container starts **web**, **Horizon**, **`schedule:wor
 Open `http://localhost` — you should see the SEISMO placeholder. Horizon (local only): `http://localhost/horizon`.
 
 Default host port forwards (change in `.env` if occupied): app `80`, Vite `5173`, Reverb `8081`, Postgres `5433`, Redis `6380`.
+
+### Broadcast smoke (Sprint 3)
+
+1. Ensure assets are built (`npm run build` or `.\sail.ps1 npm run build`) so Echo loads on the placeholder.
+2. Open `http://localhost` in two browser tabs with DevTools console open.
+3. Run `.\sail.ps1 artisan seismo:broadcast-test` (or `./vendor/bin/sail artisan seismo:broadcast-test` in WSL).
+4. Both tabs should log `[Seismo] EarthquakeDetected` with the same payload.
+
+Reverb listens in-container on `:8080` and is forwarded to host `${REVERB_SERVER_PORT}` (default `8081`).
 
 UI acceptance (later sprints): [docs/UI.md](./docs/UI.md) checklist vs mockup.
 
