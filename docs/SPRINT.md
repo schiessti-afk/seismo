@@ -30,18 +30,20 @@ Sprints **0–7** = v1.0 shippable public monitor. **8–9** = near-term roadmap
 
 Bootstrap the Laravel application and engineering baseline so later sprints only add product code.
 
+> **Implemented with Laravel 12 + PHP 8.4 Sail** (Laravel 11 is security-EOL; Composer blocks all 11.x installs. Current framework deps require PHP ≥ 8.4).
+
 ### Work
 
-- [ ] Create Laravel 11 app (PHP 8.3) in repo root; keep `docs/` as-is
-- [ ] Add Laravel Sail; override DB image to `postgis/postgis:16-3.4`
-- [ ] Wire Redis; install **Horizon**, **Reverb**, **Livewire 3**, Alpine/Vite baseline
-- [ ] Supervisor (or Sail equivalents) for: web, `horizon`, `schedule:work`, `reverb:start`
-- [ ] Publish `.env.example` with Seismo keys from Architecture (no secrets); document Sail-only local path in README
-- [ ] Repo hygiene: `.gitignore`, MIT license © Micha Schiess, README links to docs
-- [ ] GitHub Actions skeleton: checkout, Composer, Pint `--test` (tests can be noop/smoke)
-- [ ] `declare(strict_types=1);` convention; Pint + Larastan level 5 config present
-- [ ] Public `/` route renders a minimal branded placeholder (SEISMO) proving the stack boots
-- [ ] Gate `/horizon` to local only
+- [x] Create Laravel app (PHP 8.4 Sail) in repo root; keep `docs/` as-is
+- [x] Add Laravel Sail; override DB image to `postgis/postgis:16-3.4`
+- [x] Wire Redis; install **Horizon**, **Reverb**, **Livewire**, Alpine/Vite baseline
+- [x] Supervisor (or Sail equivalents) for: web, `horizon`, `schedule:work`, `reverb:start`
+- [x] Publish `.env.example` with Seismo keys from Architecture (no secrets); document Sail-only local path in README
+- [x] Repo hygiene: `.gitignore`, MIT license © Micha Schiess, README links to docs
+- [x] GitHub Actions skeleton: checkout, Composer, Pint `--test` (tests can be noop/smoke)
+- [x] `declare(strict_types=1);` convention; Pint + Larastan level 5 config present
+- [x] Public `/` route renders a minimal branded placeholder (SEISMO) proving the stack boots
+- [x] Gate `/horizon` to local only
 
 ### Exit criteria
 

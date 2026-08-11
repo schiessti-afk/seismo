@@ -2,7 +2,7 @@
 
 Self-hosted real-time seismic monitoring: USGS GeoJSON → PostgreSQL/PostGIS → Laravel Horizon → Reverb WebSockets → public Livewire + Leaflet map.
 
-> **Status:** Greenfield. Spec under [`docs/`](./docs/). App code not scaffolded yet.
+> **Status:** Sprint 0 complete — Sail stack boots with PostGIS, Redis, Horizon, scheduler, and Reverb. Product features land in later sprints.
 
 ---
 
@@ -33,17 +33,19 @@ Self-hosted real-time seismic monitoring: USGS GeoJSON → PostgreSQL/PostGIS �
 
 | Layer | Technology | Role |
 |-------|------------|------|
-| Runtime | PHP 8.3+, Docker / Laravel Sail | Local multi-container app (web, Horizon, scheduler, Reverb) |
-| Backend | Laravel 11 | HTTP, scheduling, jobs, broadcasting, i18n (`en`) |
+| Runtime | PHP 8.4 (Sail), Docker / Laravel Sail | Local multi-container app (web, Horizon, scheduler, Reverb) |
+| Backend | Laravel 12 | HTTP, scheduling, jobs, broadcasting, i18n (`en`) |
 | Queues | Redis + Laravel Horizon | Ingest / backfill workers from day one |
 | Database | PostgreSQL 16 + PostGIS | Events + `geography(Point, 4326)` spatial queries |
 | Realtime | Laravel Reverb + Redis | Public WebSocket channel `earthquakes` |
-| Frontend | Livewire 3, Alpine.js, Leaflet | Public Live/History UI (dark + red); no SPA framework |
+| Frontend | Livewire, Alpine.js, Leaflet | Public Live/History UI (dark + red); no SPA framework |
 | Map tiles | CartoDB Dark (or equivalent) | Basemap under epicenter markers |
 | Quality | Pest, Pint, Larastan 5 | GitHub Actions CI in v1 |
 | Data source | USGS GeoJSON summary feeds | `all_month` backfill · `all_hour` live poll (no API key) |
 
 Details: [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md).
+
+> **Note:** Sprint docs originally targeted Laravel 11; the scaffold uses **Laravel 12** because Laravel 11 is past security EOL and Composer blocks every 11.x install.
 
 ---
 
@@ -88,18 +90,34 @@ Full write-up: [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md).
 
 ---
 
-## Quick start (target — not wired yet)
+## Quick start (Sail only)
 
-Prerequisites: Docker Desktop.
+Prerequisites: [Docker Desktop](https://www.docker.com/products/docker-desktop/). Local PHP/Composer are optional — Sail runs the app.
 
 ```bash
 cp .env.example .env
+docker run --rm -u "$(id -u):$(id -g)" -v "$(pwd):/var/www/html" -w /var/www/html laravelsail/php84-composer:latest composer install --ignore-platform-req=ext-pcntl
 ./vendor/bin/sail up -d
+./vendor/bin/sail artisan key:generate
 ./vendor/bin/sail artisan migrate
-# Supervisor (planned): horizon + schedule:work + reverb:start
 ```
 
-Open `http://localhost`. UI acceptance: [docs/UI.md](./docs/UI.md) checklist vs mockup.
+On Windows (PowerShell), after `composer install` via Docker as above:
+
+```powershell
+cp .env.example .env
+.\vendor\bin\sail up -d
+.\vendor\bin\sail artisan key:generate
+.\vendor\bin\sail artisan migrate
+```
+
+Supervisor inside the app container starts **web**, **Horizon**, **`schedule:work`**, and **Reverb** (container `:8080`, host `${REVERB_SERVER_PORT}`).
+
+Open `http://localhost` — you should see the SEISMO placeholder. Horizon (local only): `http://localhost/horizon`.
+
+Default host port forwards (change in `.env` if occupied): app `80`, Vite `5173`, Reverb `8081`, Postgres `5433`, Redis `6380`.
+
+UI acceptance (later sprints): [docs/UI.md](./docs/UI.md) checklist vs mockup.
 
 ---
 
