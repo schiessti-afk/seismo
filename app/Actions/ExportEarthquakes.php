@@ -122,8 +122,7 @@ class ExportEarthquakes
         $raw = $earthquake->raw;
 
         if (
-            is_array($raw)
-            && ($raw['type'] ?? null) === 'Feature'
+            ($raw['type'] ?? null) === 'Feature'
             && isset($raw['geometry'])
             && is_array($raw['geometry'])
         ) {
