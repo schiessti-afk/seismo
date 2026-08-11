@@ -46,6 +46,7 @@ return [
     'new_live' => ':count new — Live',
     'slice_chip' => 'Slice ±:hours h',
     'scrubber_label' => 'Time',
-    'scrubber_aria' => 'History time scrubber',
+    'map_locate' => 'Locate',
+    'map_layers' => 'Layers',
     'history_range' => ':from — :to UTC',
 ];

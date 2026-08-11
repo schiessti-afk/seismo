@@ -2,7 +2,7 @@
 
 Self-hosted real-time seismic monitoring: USGS GeoJSON → PostgreSQL/PostGIS → Laravel Horizon → Reverb WebSockets → public Livewire + Leaflet map.
 
-> **Status:** Sprint 6 complete — History mode: mode pill toggle, time scrubber (±6h slice), slice-bound map + Activity, “N new — Live” WS chip, localStorage persistence. Sprint 7 hardening next.
+> **Status:** **v1.0** — Public Live/History monitor shipped. Horizon ingest, Reverb broadcasts (M≥2.5), filters, scrubber, full CI (Pint + Pest + Larastan). See [docs/SPRINT-7.md](./docs/SPRINT-7.md).
 
 ---
 
@@ -20,6 +20,7 @@ Self-hosted real-time seismic monitoring: USGS GeoJSON → PostgreSQL/PostGIS �
 | [docs/SPRINT-4.md](./docs/SPRINT-4.md) | Sprint 4 as-built — Live UI shell |
 | [docs/SPRINT-5.md](./docs/SPRINT-5.md) | Sprint 5 as-built — Live interactivity |
 | [docs/SPRINT-6.md](./docs/SPRINT-6.md) | Sprint 6 as-built — History mode |
+| [docs/SPRINT-7.md](./docs/SPRINT-7.md) | Sprint 7 as-built — Hardening & v1.0 freeze |
 | [docs/mockups/seismo-desktop-mockup.png](./docs/mockups/seismo-desktop-mockup.png) | Canonical Live desktop mockup |
 | [docs/mockups/seismo-architecture.png](./docs/mockups/seismo-architecture.png) | Architecture flowchart graphic |
 
@@ -138,7 +139,31 @@ Default host port forwards (change in `.env` if occupied): app `80`, Vite `5173`
 
 Reverb listens in-container on `:8080` and is forwarded to host `${REVERB_SERVER_PORT}` (default `8081`).
 
-UI acceptance (later sprints): [docs/UI.md](./docs/UI.md) checklist vs mockup.
+UI acceptance: [docs/UI.md](./docs/UI.md) checklists (Live + History complete).
+
+### Tests & quality
+
+```powershell
+.\sail.ps1 pest
+.\sail.ps1 pint
+.\sail.ps1 composer analyse
+```
+
+CI runs Pint, Larastan level 5, and Pest against PostGIS on every push/PR.
+
+### Failure modes
+
+The app degrades gracefully when dependencies fail (full detail: [ARCHITECTURE.md §10](./docs/ARCHITECTURE.md)):
+
+| Failure | Behavior |
+|---------|----------|
+| USGS timeout / 5xx | Logged; ingest job soft-fails; next scheduled poll retries |
+| Malformed GeoJSON row | Skipped; batch continues |
+| Redis down | Horizon queues stall; public HTTP may still read PostGIS |
+| Reverb down | Map and Activity show DB state; live ripples pause until reconnect |
+| Partial backfill | Completion marker stays unset; auto-retry on next boot/tick |
+
+Horizon dashboard (`/horizon`) is available in **`local` environment only**.
 
 ---
 

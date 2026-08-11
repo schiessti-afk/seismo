@@ -7,7 +7,7 @@ on:
 
 jobs:
   quality:
-    name: Pint
+    name: Pint & Larastan
     runs-on: ubuntu-latest
 
     steps:
@@ -26,6 +26,9 @@ jobs:
 
       - name: Run Pint
         run: vendor/bin/pint --test
+
+      - name: Run Larastan
+        run: vendor/bin/phpstan analyse --memory-limit=1G
 
   tests:
     name: Pest (PostGIS)

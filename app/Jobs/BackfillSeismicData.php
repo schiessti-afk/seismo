@@ -34,6 +34,7 @@ class BackfillSeismicData implements ShouldQueue
         }
 
         try {
+            /** @phpstan-ignore if.alwaysFalse (double-check after lock; another worker may have completed) */
             if (BackfillState::isComplete()) {
                 return;
             }

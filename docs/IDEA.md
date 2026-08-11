@@ -185,7 +185,7 @@ Visual reference: **[mockups/seismo-desktop-mockup.png](./mockups/seismo-desktop
 
 | Version | Status | Scope |
 |---------|--------|--------|
-| v1.0 | Planned | Horizon ingest, auto-retry backfill, Live/History, scrubber, activity panel, i18n(`en`), CI, dark+red mag-scaled markers |
+| v1.0 | Shipped | Horizon ingest, auto-retry backfill, Live/History, scrubber, activity panel, i18n(`en`), CI, dark+red mag-scaled markers |
 | v1.1 | Planned | Reverb end-to-end polish |
 | v1.2 | Planned | Optional sound; stronger M5.0+ / tsunami banner |
 | v1.3 | Planned | Export CSV / GeoJSON (rate-limited) |

@@ -147,7 +147,7 @@ it('soft-fails live ingest job on HTTP errors', function (): void {
     ]);
 
     expect(fn () => (new FetchLatestSeismicData)->handle(app(IngestUsgsFeed::class)))
-        ->not->toThrow(\Throwable::class);
+        ->not->toThrow(Throwable::class);
 
     expect(Earthquake::query()->count())->toBe(0);
 });

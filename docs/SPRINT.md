@@ -18,7 +18,7 @@ No durations — each sprint ends when its **exit criteria** are met.
 | 4 | Live UI shell | Desktop chrome matches mockup; map + Activity from DB | — |
 | 5 | Live interactivity | Window presets, filters, WS ripples, popups, pagination | [SPRINT-5.md](./SPRINT-5.md) |
 | 6 | History mode | Time scrubber + slice queries in same shell | [SPRINT-6.md](./SPRINT-6.md) |
-| 7 | Hardening | Full Pest suite, CI green, i18n/times polish | — |
+| 7 | Hardening | Full Pest suite, CI green, i18n/times polish | [SPRINT-7.md](./SPRINT-7.md) |
 | 8 | Alerts polish | M5.0+ / tsunami emphasis, optional sound (roadmap v1.2) | — |
 | 9 | Exports | CSV / GeoJSON of stored data, rate-limited (roadmap v1.3) | — |
 
@@ -206,13 +206,13 @@ Productionize the v1.0 slice: tests, CI, polish, ops docs.
 
 ### Work
 
-- [ ] Expand Pest: ingest, idempotency, broadcast gate, scopes, Livewire modes
-- [ ] CI: Pint, Pest (with PostGIS service), Larastan level 5 — all green on main
-- [ ] Review i18n coverage; Local primary / UTC secondary everywhere events show
-- [ ] Confirm Horizon auth gate; README quick start matches real commands
-- [ ] Failure-mode pass: USGS down, Reverb down, Redis restart — app degrades as documented
-- [ ] UI.md acceptance checklist complete for Live; History behaviors documented
-- [ ] Tag / declare **v1.0** in README status
+- [x] Expand Pest: ingest, idempotency, broadcast gate, scopes, Livewire modes
+- [x] CI: Pint, Pest (with PostGIS service), Larastan level 5 — all green on main
+- [x] Review i18n coverage; Local primary / UTC secondary everywhere events show
+- [x] Confirm Horizon auth gate; README quick start matches real commands
+- [x] Failure-mode pass: USGS down, Reverb down, Redis restart — app degrades as documented
+- [x] UI.md acceptance checklist complete for Live; History behaviors documented
+- [x] Tag / declare **v1.0** in README status
 
 ### Exit criteria
 

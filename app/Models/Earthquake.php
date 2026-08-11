@@ -28,6 +28,15 @@ use Illuminate\Support\Facades\DB;
  * @property array<string, mixed> $raw
  * @property float|null $latitude
  * @property float|null $longitude
+ *
+ * @method static Builder<Earthquake> magnitudeBetween(?float $min, ?float $max)
+ * @method static Builder<Earthquake> depthBetween(?float $minKm, ?float $maxKm)
+ * @method static Builder<Earthquake> occurredBetween(Carbon $from, Carbon $to)
+ * @method static Builder<Earthquake> withinRadius(float $lat, float $lon, float $km)
+ * @method static Builder<Earthquake> tsunami(string $enum = 'all')
+ * @method static Builder<Earthquake> placeLike(?string $search)
+ * @method static Builder<Earthquake> orderByOccurredDesc()
+ * @method static Builder<Earthquake> orderByMagnitudeDesc()
  */
 class Earthquake extends Model
 {

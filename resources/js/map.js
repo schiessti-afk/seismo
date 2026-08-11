@@ -100,10 +100,10 @@ class SeismoMap {
             const div = L.DomUtil.create('div', 'leaflet-bar leaflet-control seismo-locate-control');
             const btn = L.DomUtil.create('a', 'seismo-locate-btn', div);
             btn.href = '#';
-            btn.title = 'Locate';
+            btn.title = this.labels.locate ?? 'Locate';
             btn.innerHTML = '&#8982;';
             btn.setAttribute('role', 'button');
-            btn.setAttribute('aria-label', 'Locate');
+            btn.setAttribute('aria-label', this.labels.locate ?? 'Locate');
 
             L.DomEvent.disableClickPropagation(div);
             L.DomEvent.on(btn, 'click', (e) => {
@@ -120,10 +120,10 @@ class SeismoMap {
             const div = L.DomUtil.create('div', 'leaflet-bar leaflet-control seismo-layers-control');
             const btn = L.DomUtil.create('a', 'seismo-layers-btn', div);
             btn.href = '#';
-            btn.title = 'Layers';
+            btn.title = this.labels.layers ?? 'Layers';
             btn.innerHTML = '&#9776;';
             btn.setAttribute('role', 'button');
-            btn.setAttribute('aria-label', 'Layers');
+            btn.setAttribute('aria-label', this.labels.layers ?? 'Layers');
 
             L.DomEvent.disableClickPropagation(div);
             L.DomEvent.on(btn, 'click', (e) => {

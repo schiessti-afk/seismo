@@ -269,6 +269,8 @@
                 'local' => __('seismo.local_suffix'),
                 'utc' => __('seismo.utc_prefix'),
                 'close' => __('seismo.popup_close'),
+                'locate' => __('seismo.map_locate'),
+                'layers' => __('seismo.map_layers'),
             ]) }}">@json($mapEvents)</script>
         </div>
     </div>

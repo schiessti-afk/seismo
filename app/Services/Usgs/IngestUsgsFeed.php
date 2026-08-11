@@ -24,8 +24,8 @@ final class IngestUsgsFeed
             return new IngestResult(successful: false, upserted: 0, skipped: 0, broadcasts: 0);
         }
 
-        /** @var list<array<string, mixed>> $features */
-        $features = is_array($payload['features'] ?? null) ? $payload['features'] : [];
+        $rawFeatures = $payload['features'] ?? null;
+        $features = is_array($rawFeatures) ? $rawFeatures : [];
 
         $upserted = 0;
         $skipped = 0;

@@ -14,7 +14,6 @@ class ApplyEarthquakeFilters
      * @return Builder<Earthquake>
      */
     public function __invoke(
-        ?Builder $query = null,
         float $minMagnitude = 0,
         ?float $maxMagnitude = null,
         ?float $minDepth = null,
@@ -28,7 +27,7 @@ class ApplyEarthquakeFilters
         ?Carbon $occurredTo = null,
         string $sort = 'occurred',
     ): Builder {
-        $query ??= Earthquake::query();
+        $query = Earthquake::query();
 
         $query->magnitudeBetween($minMagnitude, $maxMagnitude);
 

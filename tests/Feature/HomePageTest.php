@@ -98,6 +98,56 @@ it('applies place and magnitude filters via livewire', function (): void {
         ->assertDontSee('Northern California', false);
 });
 
+it('applies depth and tsunami filters via livewire', function (): void {
+    Earthquake::factory()->create([
+        'usgs_id' => 'us7000shallow',
+        'magnitude' => 4.0,
+        'depth_km' => 5.0,
+        'tsunami' => false,
+        'occurred_at' => now()->subHours(1),
+        'place' => 'Shallow Pacific Event',
+    ]);
+
+    Earthquake::factory()->create([
+        'usgs_id' => 'us7000deep',
+        'magnitude' => 4.0,
+        'depth_km' => 50.0,
+        'tsunami' => false,
+        'occurred_at' => now()->subHours(1),
+        'place' => 'Deep Pacific Event',
+    ]);
+
+    Livewire::test(LiveMonitor::class)
+        ->set('maxDepth', 10.0)
+        ->call('applyFilters')
+        ->assertSee('Shallow Pacific Event', false)
+        ->assertDontSee('Deep Pacific Event', false);
+
+    Earthquake::factory()->create([
+        'usgs_id' => 'us7000tsu',
+        'magnitude' => 4.0,
+        'depth_km' => 10.0,
+        'tsunami' => true,
+        'occurred_at' => now()->subHours(1),
+        'place' => 'Tsunami Warning Region',
+    ]);
+
+    Earthquake::factory()->create([
+        'usgs_id' => 'us7000notsu',
+        'magnitude' => 4.0,
+        'depth_km' => 10.0,
+        'tsunami' => false,
+        'occurred_at' => now()->subHours(1),
+        'place' => 'No Tsunami Region',
+    ]);
+
+    Livewire::test(LiveMonitor::class)
+        ->set('tsunami', 'yes')
+        ->call('applyFilters')
+        ->assertSee('Tsunami Warning Region', false)
+        ->assertDontSee('No Tsunami Region', false);
+});
+
 it('resets filters to defaults', function (): void {
     Livewire::test(LiveMonitor::class)
         ->set('minMagnitude', 1.0)

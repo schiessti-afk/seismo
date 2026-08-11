@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Jobs\BackfillSeismicData;
 use App\Models\Earthquake;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Bus;
 
@@ -31,7 +32,7 @@ it('enforces unique usgs_id', function (): void {
     Earthquake::factory()->create(['usgs_id' => 'us7000dup01']);
 
     expect(fn () => Earthquake::factory()->create(['usgs_id' => 'us7000dup01']))
-        ->toThrow(\Illuminate\Database\QueryException::class);
+        ->toThrow(QueryException::class);
 });
 
 it('filters earthquakes within a spatial radius', function (): void {
@@ -81,6 +82,59 @@ it('applies magnitude and occurred_at filter scopes', function (): void {
 
     expect($results)->toHaveCount(1)
         ->and($results->first()?->usgs_id)->toBe('us7000hit01');
+});
+
+it('filters earthquakes by depth range', function (): void {
+    Earthquake::factory()->create([
+        'usgs_id' => 'us7000shallow',
+        'depth_km' => 5.0,
+    ]);
+
+    Earthquake::factory()->create([
+        'usgs_id' => 'us7000deep',
+        'depth_km' => 50.0,
+    ]);
+
+    $results = Earthquake::query()
+        ->depthBetween(null, 10.0)
+        ->get();
+
+    expect($results)->toHaveCount(1)
+        ->and($results->first()?->usgs_id)->toBe('us7000shallow');
+});
+
+it('filters earthquakes by tsunami flag', function (): void {
+    Earthquake::factory()->create([
+        'usgs_id' => 'us7000tsu',
+        'tsunami' => true,
+    ]);
+
+    Earthquake::factory()->create([
+        'usgs_id' => 'us7000not',
+        'tsunami' => false,
+    ]);
+
+    expect(Earthquake::query()->tsunami('yes')->get())->toHaveCount(1)
+        ->and(Earthquake::query()->tsunami('no')->get())->toHaveCount(1)
+        ->and(Earthquake::query()->tsunami('all')->get())->toHaveCount(2);
+});
+
+it('orders earthquakes by magnitude descending', function (): void {
+    Earthquake::factory()->create([
+        'usgs_id' => 'us7000low',
+        'magnitude' => 3.0,
+    ]);
+
+    Earthquake::factory()->create([
+        'usgs_id' => 'us7000high',
+        'magnitude' => 6.0,
+    ]);
+
+    $results = Earthquake::query()
+        ->orderByMagnitudeDesc()
+        ->get();
+
+    expect($results->first()?->usgs_id)->toBe('us7000high');
 });
 
 it('dispatches the backfill job from artisan command', function (): void {
