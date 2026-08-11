@@ -84,14 +84,14 @@ Fill the database from USGS; never duplicate; recover from failed backfill.
 
 ### Work
 
-- [ ] USGS HTTP client for summary GeoJSON (`all_month`, `all_hour` URLs from env)
-- [ ] Parser: Feature → attributes + `raw` jsonb; skip invalid geometry with logs
-- [ ] Job `BackfillSeismicData`: upsert batch; set `backfill_completed` only on full success
-- [ ] Job `FetchLatestSeismicData`: upsert `all_hour`; no broadcast yet (or no-op dispatch)
-- [ ] Auto-retry: on boot/schedule, dispatch backfill if marker missing + lock free
-- [ ] Schedule live job every 60s; run through Horizon
-- [ ] Idempotency Pest: same fixture twice → one row; `recorded_at` stable on update
-- [ ] Soft-fail on USGS timeout/5xx (log, don’t kill Horizon)
+- [x] USGS HTTP client for summary GeoJSON (`all_month`, `all_hour` URLs from env)
+- [x] Parser: Feature → attributes + `raw` jsonb; skip invalid geometry with logs
+- [x] Job `BackfillSeismicData`: upsert batch; set `backfill_completed` only on full success
+- [x] Job `FetchLatestSeismicData`: upsert `all_hour`; no broadcast yet (or no-op dispatch)
+- [x] Auto-retry: on boot/schedule, dispatch backfill if marker missing + lock free
+- [x] Schedule live job every 60s; run through Horizon
+- [x] Idempotency Pest: same fixture twice → one row; `recorded_at` stable on update
+- [x] Soft-fail on USGS timeout/5xx (log, don’t kill Horizon)
 
 ### Exit criteria
 

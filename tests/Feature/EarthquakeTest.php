@@ -2,8 +2,10 @@
 
 declare(strict_types=1);
 
+use App\Jobs\BackfillSeismicData;
 use App\Models\Earthquake;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Bus;
 
 it('persists an earthquake from the factory with raw json and coordinates', function (): void {
     $earthquake = Earthquake::factory()->create([
@@ -81,8 +83,12 @@ it('applies magnitude and occurred_at filter scopes', function (): void {
         ->and($results->first()?->usgs_id)->toBe('us7000hit01');
 });
 
-it('runs the backfill command stub', function (): void {
+it('dispatches the backfill job from artisan command', function (): void {
+    Bus::fake();
+
     $this->artisan('seismo:backfill')
-        ->expectsOutputToContain('not implemented yet')
+        ->expectsOutputToContain('Backfill job dispatched')
         ->assertSuccessful();
+
+    Bus::assertDispatched(BackfillSeismicData::class);
 });

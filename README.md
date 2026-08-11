@@ -2,7 +2,7 @@
 
 Self-hosted real-time seismic monitoring: USGS GeoJSON → PostgreSQL/PostGIS → Laravel Horizon → Reverb WebSockets → public Livewire + Leaflet map.
 
-> **Status:** Sprint 1 complete — PostGIS `earthquakes` schema, `Earthquake` model with spatial/filter scopes, Pest coverage, and `seismo:backfill` stub. Ingest lands in Sprint 2.
+> **Status:** Sprint 2 complete — USGS ingest via Horizon jobs (`BackfillSeismicData`, `FetchLatestSeismicData`), idempotent upserts, auto-retry backfill marker, and Pest coverage. Realtime broadcasting lands in Sprint 3.
 
 ---
 
@@ -104,12 +104,18 @@ docker run --rm -u "$(id -u):$(id -g)" -v "$(pwd):/var/www/html" -w /var/www/htm
 
 On Windows (PowerShell), after `composer install` via Docker as above:
 
+> **Do not run `.\vendor\bin\sail` directly** — it is a bash script and Windows will prompt “Choose an app to open sail”. Use the project wrapper instead:
+
 ```powershell
 cp .env.example .env
-.\vendor\bin\sail up -d
-.\vendor\bin\sail artisan key:generate
-.\vendor\bin\sail artisan migrate
+.\sail.ps1 up -d
+.\sail.ps1 artisan key:generate
+.\sail.ps1 artisan migrate
 ```
+
+(`sail.bat` works the same from Command Prompt: `sail.bat up -d`.)
+
+Laravel Sail officially targets WSL2 on Windows; `sail.ps1` forwards to `docker compose` for native PowerShell. Alternatively, install [WSL2](https://learn.microsoft.com/en-us/windows/wsl/install) and run `./vendor/bin/sail` from an Ubuntu terminal.
 
 Supervisor inside the app container starts **web**, **Horizon**, **`schedule:work`**, and **Reverb** (container `:8080`, host `${REVERB_SERVER_PORT}`).
 

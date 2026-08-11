@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
+use App\Jobs\BackfillSeismicData;
 use Illuminate\Console\Command;
 
 class SeismoBackfillCommand extends Command
@@ -16,11 +17,13 @@ class SeismoBackfillCommand extends Command
     /**
      * @var string
      */
-    protected $description = 'Backfill earthquake data from USGS (Sprint 2)';
+    protected $description = 'Backfill earthquake data from USGS all_month feed';
 
     public function handle(): int
     {
-        $this->warn('seismo:backfill is not implemented yet — USGS ingest lands in Sprint 2.');
+        BackfillSeismicData::dispatch();
+
+        $this->info('Backfill job dispatched to Horizon.');
 
         return self::SUCCESS;
     }
