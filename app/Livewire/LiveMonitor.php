@@ -353,6 +353,32 @@ class LiveMonitor extends Component
         return (clone $this->baseQuery())->where('tsunami', true)->exists();
     }
 
+    /**
+     * @return array<string, float|int|string>
+     */
+    public function exportQueryParams(): array
+    {
+        $params = [
+            'min_magnitude' => $this->minMagnitude,
+            'max_magnitude' => $this->maxMagnitude,
+            'min_depth' => $this->minDepth,
+            'max_depth' => $this->maxDepth,
+            'center_lat' => $this->centerLat,
+            'center_lon' => $this->centerLon,
+            'radius_km' => $this->radiusKm,
+            'tsunami' => $this->tsunami,
+            'place' => $this->place !== '' ? $this->place : null,
+            'sort' => $this->sort,
+            'occurred_from' => $this->windowFrom()->toIso8601String(),
+            'occurred_to' => $this->windowTo()->toIso8601String(),
+        ];
+
+        return array_filter(
+            $params,
+            static fn (mixed $value): bool => $value !== null && $value !== '',
+        );
+    }
+
     public function render(): View
     {
         return view('livewire.live-monitor', [

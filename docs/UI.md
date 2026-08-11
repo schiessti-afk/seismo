@@ -48,6 +48,8 @@ The Live desktop UI must match that mockup’s structure, chrome, copy patterns,
 
 Additional filters (depth, radius, tsunami, place, mag max) open from the Magnitude / filter control — not as a second header row. Default applied filter: hide magnitude **&lt; 2.5**.
 
+**v1.3 exports:** the filter panel also exposes **Export CSV** and **Export GeoJSON** links (not shown on the canonical mockup). Downloads use the current filter set and Live window / History slice bounds; responses are row-capped and rate-limited (see [SPRINT-9.md](./SPRINT-9.md)).
+
 ### 2.2 Activity sidebar (left)
 
 | Element | Spec |
@@ -137,6 +139,15 @@ Significant-event emphasis without changing the mockup shell layout.
 - [x] Map popup tsunami line; incremental M≥5 marker emphasis
 - [x] Live sound toggle default off; M≥5 or tsunami WS only
 - [x] i18n keys for banner, badges, sound
+
+---
+
+## 6.2 Implementation checklist (accept exports v1.3)
+
+- [x] Filter-panel Export CSV / Export GeoJSON links
+- [x] Export respects current filters + Live window / History slice
+- [x] Hard row cap + rate limit on public export routes
+- [x] i18n keys for export affordance + cap note
 
 ---
 

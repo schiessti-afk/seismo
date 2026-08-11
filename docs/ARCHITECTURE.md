@@ -400,7 +400,7 @@ No USGS API key. Do not invent one in `.env.example`.
 - Validate GeoJSON before persist (types, ranges for lat/lon/depth/mag).
 - Poll politely: one live URL / minute; backfill once when empty.
 - Lock down `/horizon` outside local.
-- Future public exports: pagination / caps.
+- Public exports at `/export/csv` and `/export/geojson`: require bounded `occurred_from` / `occurred_to`, hard cap `SEISMO_EXPORT_MAX_ROWS` (default 5000), IP rate limit `SEISMO_EXPORT_RATE_PER_MINUTE` (default 10/min) via `throttle:exports`.
 
 ---
 

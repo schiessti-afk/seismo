@@ -53,4 +53,14 @@ return [
 
     'alert_min_magnitude' => (float) env('SEISMO_ALERT_MIN_MAGNITUDE', 5.0),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Public exports
+    |--------------------------------------------------------------------------
+    */
+
+    'export_max_rows' => (int) env('SEISMO_EXPORT_MAX_ROWS', 5000),
+
+    'export_rate_per_minute' => (int) env('SEISMO_EXPORT_RATE_PER_MINUTE', 10),
+
 ];

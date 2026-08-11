@@ -20,7 +20,7 @@ No durations — each sprint ends when its **exit criteria** are met.
 | 6 | History mode | Time scrubber + slice queries in same shell | [SPRINT-6.md](./SPRINT-6.md) |
 | 7 | Hardening | Full Pest suite, CI green, i18n/times polish | [SPRINT-7.md](./SPRINT-7.md) |
 | 8 | Alerts polish | M5.0+ / tsunami emphasis, optional sound (roadmap v1.2) | [SPRINT-8.md](./SPRINT-8.md) |
-| 9 | Exports | CSV / GeoJSON of stored data, rate-limited (roadmap v1.3) | — |
+| 9 | Exports | CSV / GeoJSON of stored data, rate-limited (roadmap v1.3) | [SPRINT-9.md](./SPRINT-9.md) |
 
 Sprints **0–7** = v1.0 shippable public monitor. **8–9** = near-term roadmap. Multi-provider (v2.0) is out of this plan.
 
@@ -248,11 +248,11 @@ Download what this instance has stored.
 
 ### Work
 
-- [ ] Export endpoints or actions: CSV and GeoJSON of filtered/stored set
-- [ ] Hard caps / rate limits / pagination for public abuse resistance
-- [ ] Optional Parquet only if low-cost; otherwise defer
-- [ ] Pest for export shape + cap enforcement
-- [ ] Document usage in README
+- [x] Export endpoints or actions: CSV and GeoJSON of filtered/stored set
+- [x] Hard caps / rate limits / pagination for public abuse resistance
+- [x] Optional Parquet only if low-cost; otherwise defer
+- [x] Pest for export shape + cap enforcement
+- [x] Document usage in README
 
 ### Exit criteria
 
@@ -268,7 +268,6 @@ Download what this instance has stored.
 - Additional locales beyond `en` keys
 - Auth, multi-tenant SaaS, mobile apps
 - VPS/Coolify production runbook (v1 docs stay Sail-local)
-- History-mode marketing mockup image (optional nicety)
 
 ---
 

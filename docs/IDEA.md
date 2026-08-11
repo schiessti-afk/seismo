@@ -188,7 +188,7 @@ Visual reference: **[mockups/seismo-desktop-mockup.png](./mockups/seismo-desktop
 | v1.0 | Shipped | Horizon ingest, auto-retry backfill, Live/History, scrubber, activity panel, i18n(`en`), CI, dark+red mag-scaled markers |
 | v1.1 | Planned | Reverb end-to-end polish |
 | v1.2 | Shipped | Optional sound; stronger M5.0+ / tsunami banner |
-| v1.3 | Planned | Export CSV / GeoJSON (rate-limited) |
+| v1.3 | Shipped | Export CSV / GeoJSON (rate-limited) |
 | v2.0 | Planned | Multi-provider (EMSC, JMA); optional FDSN; additional locales |
 
 ---
@@ -196,8 +196,7 @@ Visual reference: **[mockups/seismo-desktop-mockup.png](./mockups/seismo-desktop
 ## 8. Remaining open items (narrow)
 
 1. Horizon / Reverb / scheduler Supervisor wiring in Sail (see Architecture).
-2. Export rate limits when v1.3 lands.
-3. History-mode mockup (Live mockup is canonical; History reuses shell per UI.md).
+2. History-mode mockup (Live mockup is canonical; History reuses shell per UI.md).
 
 ---
 

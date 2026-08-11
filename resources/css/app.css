@@ -271,6 +271,34 @@ body {
     color: #fff;
 }
 
+.seismo-filter-export {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.625rem 0.875rem;
+    margin-top: 0.875rem;
+    padding-top: 0.875rem;
+    border-top: 1px solid var(--seismo-border);
+}
+
+.seismo-filter-export-link {
+    font-size: 0.8125rem;
+    color: var(--seismo-accent);
+    text-decoration: none;
+}
+
+.seismo-filter-export-link:hover {
+    text-decoration: underline;
+}
+
+.seismo-filter-export-note {
+    flex: 1 1 100%;
+    margin: 0;
+    font-size: 0.75rem;
+    color: var(--seismo-muted);
+    line-height: 1.4;
+}
+
 [x-cloak] {
     display: none !important;
 }

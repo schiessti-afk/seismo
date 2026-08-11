@@ -149,6 +149,26 @@
                             {{ __('seismo.filter_reset') }}
                         </button>
                     </div>
+
+                    <div class="seismo-filter-export">
+                        <a
+                            href="{{ route('export.csv', $this->exportQueryParams()) }}"
+                            class="seismo-filter-export-link"
+                            target="_blank"
+                            rel="noopener"
+                        >
+                            {{ __('seismo.export_csv') }}
+                        </a>
+                        <a
+                            href="{{ route('export.geojson', $this->exportQueryParams()) }}"
+                            class="seismo-filter-export-link"
+                            target="_blank"
+                            rel="noopener"
+                        >
+                            {{ __('seismo.export_geojson') }}
+                        </a>
+                        <p class="seismo-filter-export-note">{{ __('seismo.export_truncated_hint', ['max' => config('seismo.export_max_rows')]) }}</p>
+                    </div>
                 </div>
             </div>
 

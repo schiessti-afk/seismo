@@ -55,4 +55,7 @@ return [
     'sound_on' => 'Sound on',
     'sound_off' => 'Sound off',
     'sound_toggle_aria' => 'Toggle alert sound for significant events',
+    'export_csv' => 'Export CSV',
+    'export_geojson' => 'Export GeoJSON',
+    'export_truncated_hint' => 'Exports use current filters and are capped at :max rows.',
 ];

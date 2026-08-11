@@ -1,67 +1,102 @@
 # Seismo
 
-Self-hosted real-time seismic monitoring: USGS GeoJSON → PostgreSQL/PostGIS → Laravel Horizon → Reverb WebSockets → public Livewire + Leaflet map.
+**Self-hosted real-time earthquake monitor** — USGS GeoJSON in, PostGIS + Horizon + Reverb out, dark Livewire map in the browser. No API key, no login, one Docker stack.
 
-> **Status:** **v1.2** — v1.0 Live/History monitor plus alert polish (M≥5.0 emphasis, tsunami banner, optional sound). See [docs/SPRINT-8.md](./docs/SPRINT-8.md).
+Built as a portfolio piece to show an event-driven Laravel app: scheduled ingest, queues, spatial queries, and WebSockets — not another CRUD todo list.
 
----
+![Seismo Live monitor — Activity sidebar, dark world map, magnitude-scaled markers](docs/mockups/seismo-desktop-mockup.png)
 
-## Docs
-
-| Doc | Purpose |
-|-----|---------|
-| [docs/IDEA.md](./docs/IDEA.md) | Product intent, locked decisions, roadmap |
-| [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) | Containers, ingest/backfill, schema, CI |
-| [docs/UI.md](./docs/UI.md) | **Desktop UI spec** (must match mockup) |
-| [docs/SPRINT.md](./docs/SPRINT.md) | Sprint plan (0–9) with exit criteria |
-| [docs/SPRINT-1.md](./docs/SPRINT-1.md) | Sprint 1 as-built — PostGIS + `Earthquake` |
-| [docs/SPRINT-2.md](./docs/SPRINT-2.md) | Sprint 2 as-built — USGS ingest & backfill |
-| [docs/SPRINT-3.md](./docs/SPRINT-3.md) | Sprint 3 as-built — Reverb broadcasts |
-| [docs/SPRINT-4.md](./docs/SPRINT-4.md) | Sprint 4 as-built — Live UI shell |
-| [docs/SPRINT-5.md](./docs/SPRINT-5.md) | Sprint 5 as-built — Live interactivity |
-| [docs/SPRINT-6.md](./docs/SPRINT-6.md) | Sprint 6 as-built — History mode |
-| [docs/SPRINT-7.md](./docs/SPRINT-7.md) | Sprint 7 as-built — Hardening & v1.0 freeze |
-| [docs/SPRINT-8.md](./docs/SPRINT-8.md) | Sprint 8 as-built — Alerts polish (v1.2) |
-| [docs/mockups/seismo-desktop-mockup.png](./docs/mockups/seismo-desktop-mockup.png) | Canonical Live desktop mockup |
-| [docs/mockups/seismo-architecture.png](./docs/mockups/seismo-architecture.png) | Architecture flowchart graphic |
+**Status:** v1.3 (Live / History monitor, alert chrome, CSV & GeoJSON exports)
 
 ---
 
-## What it does
+## Features
 
-1. **Backfill** on first boot (auto-retries): USGS `all_month` (~30 days) + `raw` jsonb.
-2. **Live ingest** every 60s: USGS `all_hour` via Horizon (store all magnitudes).
-3. **Public Live desktop** as in the mockup: SEISMO header, Live/History pill, Activity sidebar (15/page), dark map, Live Window presets `1h…7d` (default 24h).
-4. Ripples / Activity pushes for **M≥2.5**; markers scale red/size with magnitude; popup = Local + small UTC.
-5. **History:** same shell, bottom time scrubber (drag only).
+- **Live map** — USGS events on a dark Leaflet basemap; markers scale with magnitude; ripples over WebSockets for M≥2.5
+- **Activity feed** — paginated sidebar (15/page) with local time primary, UTC secondary
+- **Live window presets** — 1h · 3h · 6h · 12h · 24h · 48h · 7d (default 24h)
+- **History mode** — same shell, drag-only time scrubber over stored events
+- **Filters** — magnitude, depth, radius, tsunami flag, place search
+- **Alerts polish** — stronger treatment for M≥5.0 and tsunami-flagged events; optional sound (off by default)
+- **Exports** — bounded CSV / GeoJSON of the current filtered set (rate-limited)
+- **First-boot backfill** — ~30 days from USGS `all_month`, then `all_hour` every 60s via Horizon
 
 ---
 
 ## Tech stack
 
-| Layer | Technology | Role |
-|-------|------------|------|
-| Runtime | PHP 8.4 (Sail), Docker / Laravel Sail | Local multi-container app (web, Horizon, scheduler, Reverb) |
-| Backend | Laravel 12 | HTTP, scheduling, jobs, broadcasting, i18n (`en`) |
-| Queues | Redis + Laravel Horizon | Ingest / backfill workers from day one |
-| Database | PostgreSQL 16 + PostGIS | Events + `geography(Point, 4326)` spatial queries |
-| Realtime | Laravel Reverb + Redis | Public WebSocket channel `earthquakes` |
-| Frontend | Livewire, Alpine.js, Leaflet | Public Live/History UI (dark + red); no SPA framework |
-| Map tiles | CartoDB Dark (or equivalent) | Basemap under epicenter markers |
-| Quality | Pest, Pint, Larastan 5 | GitHub Actions CI in v1 |
-| Data source | USGS GeoJSON summary feeds | `all_month` backfill · `all_hour` live poll (no API key) |
-
-Details: [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md).
-
-> **Note:** Sprint docs originally targeted Laravel 11; the scaffold uses **Laravel 12** because Laravel 11 is past security EOL and Composer blocks every 11.x install.
+| Layer | Choice |
+|-------|--------|
+| App | Laravel 12 · PHP 8.4 · Livewire · Alpine.js |
+| Data | PostgreSQL 16 + PostGIS · Redis |
+| Realtime | Laravel Reverb (public `earthquakes` channel) |
+| Jobs | Laravel Horizon (ingest + backfill) |
+| Map | Leaflet · CartoDB Dark tiles |
+| Quality | Pest · Pint · Larastan 5 · GitHub Actions |
+| Source | [USGS GeoJSON summary feeds](https://earthquake.usgs.gov/earthquakes/feed/v1.0/geojson.php) (no key) |
 
 ---
 
-## Architecture (summary)
+## Quick start
 
-USGS feeds are pulled on a schedule into Horizon jobs, upserted into PostGIS (idempotent by USGS id), and — for new or materially changed **M≥2.5** events — broadcast over Reverb to the public browser UI.
+**Prerequisite:** [Docker Desktop](https://www.docker.com/products/docker-desktop/) running. No local PHP, Composer, or Node required.
 
-![Seismo architecture: USGS → Sail (Scheduler, Horizon) → PostGIS / Redis → Reverb → Livewire + Leaflet browser](docs/mockups/seismo-architecture.png)
+### Windows (PowerShell)
+
+```powershell
+git clone <repo-url> seismo
+cd seismo
+.\setup.ps1
+```
+
+Then open [http://localhost](http://localhost). Horizon (local only): [http://localhost/horizon](http://localhost/horizon).
+
+Day-to-day:
+
+```powershell
+.\sail.ps1 up -d    # start
+.\sail.ps1 down     # stop
+.\sail.ps1 pest     # tests
+```
+
+> Do **not** run `.\vendor\bin\sail` directly on Windows — it is a bash script. Use `.\sail.ps1` (or `sail.bat` from Command Prompt).
+
+### macOS / Linux / WSL
+
+```bash
+git clone <repo-url> seismo
+cd seismo
+chmod +x setup.sh
+./setup.sh
+```
+
+Then open [http://localhost](http://localhost).
+
+```bash
+./vendor/bin/sail up -d
+./vendor/bin/sail down
+./vendor/bin/sail pest
+```
+
+### What setup does
+
+1. Copies `.env.example` → `.env` if needed  
+2. `composer install` via the official Sail Composer image  
+3. `docker compose up -d` (web, Horizon, scheduler, Reverb, PostGIS, Redis)  
+4. `artisan key:generate` + `migrate`  
+5. `npm install` + `npm run build` inside the app container  
+
+First boot also starts a USGS backfill in the background — the map may be empty for a minute or two until events land.
+
+Default host ports (change in `.env` if taken): app `80`, Vite `5173`, Reverb `8081`, Postgres `5433`, Redis `6380`.
+
+---
+
+## Architecture
+
+USGS feeds are scheduled into Horizon jobs, upserted into PostGIS (idempotent by USGS id), and — for new or materially changed **M≥2.5** events — broadcast over Reverb to the public UI.
+
+![Seismo architecture: USGS → Sail (Scheduler, Horizon) → PostGIS / Redis → Reverb → Livewire + Leaflet](docs/mockups/seismo-architecture.png)
 
 ```text
   USGS GeoJSON                 Docker / Laravel Sail
@@ -83,103 +118,76 @@ USGS feeds are pulled on a schedule into Horizon jobs, upserted into PostGIS (id
                                       ▼                       │
                                 ┌────────────┐                │
                                 │   Reverb   │────────────────┘
-                                │  (WS :8080)│   M≥2.5 events
+                                │  (WS)      │   M≥2.5 events
                                 └────────────┘
 ```
 
 | Path | Behavior |
 |------|----------|
-| First boot | `all_month` backfill (~30 days), auto-retry until complete; no WS storm |
+| First boot | `all_month` backfill (~30 days); auto-retry until complete |
 | Steady state | `all_hour` every 60s; store all magnitudes |
-| Live UI | Query last window (default 24h); ripples + Activity for M≥2.5 |
+| Live UI | Query selected window (default 24h); ripples + Activity for M≥2.5 |
 | History UI | Same shell; bottom time scrubber (drag only) |
 
-Full write-up: [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md).
+Deeper write-up: [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md).
+
+### Failure modes (short)
+
+| Failure | Behavior |
+|---------|----------|
+| USGS timeout / 5xx | Logged; next poll retries |
+| Bad GeoJSON row | Skipped; batch continues |
+| Redis down | Queues stall; HTTP can still read PostGIS |
+| Reverb down | Map/Activity from DB; live ripples pause |
 
 ---
 
-## Quick start (Sail only)
+## Exports
 
-Prerequisites: [Docker Desktop](https://www.docker.com/products/docker-desktop/). Local PHP/Composer are optional — Sail runs the app.
+From the Magnitude filter panel: **Export CSV** / **Export GeoJSON** for the current Live window or History slice.
 
-```bash
-cp .env.example .env
-docker run --rm -u "$(id -u):$(id -g)" -v "$(pwd):/var/www/html" -w /var/www/html laravelsail/php84-composer:latest composer install --ignore-platform-req=ext-pcntl
-./vendor/bin/sail up -d
-./vendor/bin/sail artisan key:generate
-./vendor/bin/sail artisan migrate
+```text
+GET /export/csv?min_magnitude=2.5&occurred_from=...&occurred_to=...
+GET /export/geojson?min_magnitude=2.5&occurred_from=...&occurred_to=...
 ```
 
-On Windows (PowerShell), after `composer install` via Docker as above:
+`occurred_from` and `occurred_to` are required. Caps: `SEISMO_EXPORT_MAX_ROWS` (default 5000), `SEISMO_EXPORT_RATE_PER_MINUTE` (default 10). Truncated responses include `X-Seismo-Export-Truncated: 1`.
 
-> **Do not run `.\vendor\bin\sail` directly** — it is a bash script and Windows will prompt “Choose an app to open sail”. Use the project wrapper instead:
+---
 
-```powershell
-cp .env.example .env
-.\sail.ps1 up -d
-.\sail.ps1 artisan key:generate
-.\sail.ps1 artisan migrate
-```
-
-(`sail.bat` works the same from Command Prompt: `sail.bat up -d`.)
-
-Laravel Sail officially targets WSL2 on Windows; `sail.ps1` forwards to `docker compose` for native PowerShell. Alternatively, install [WSL2](https://learn.microsoft.com/en-us/windows/wsl/install) and run `./vendor/bin/sail` from an Ubuntu terminal.
-
-Supervisor inside the app container starts **web**, **Horizon**, **`schedule:work`**, and **Reverb** (container `:8080`, host `${REVERB_SERVER_PORT}`).
-
-Open `http://localhost` — you should see the Live monitor (SEISMO header, Activity sidebar, dark map). Horizon (local only): `http://localhost/horizon`.
-
-Default host port forwards (change in `.env` if occupied): app `80`, Vite `5173`, Reverb `8081`, Postgres `5433`, Redis `6380`.
-
-### Broadcast smoke (Sprint 3)
-
-1. Ensure assets are built (`npm run build` or `.\sail.ps1 npm run build`) so Echo loads on the placeholder.
-2. Open `http://localhost` in two browser tabs with DevTools console open.
-3. Run `.\sail.ps1 artisan seismo:broadcast-test` (or `./vendor/bin/sail artisan seismo:broadcast-test` in WSL).
-4. Both tabs should log `[Seismo] EarthquakeDetected` with the same payload.
-
-Reverb listens in-container on `:8080` and is forwarded to host `${REVERB_SERVER_PORT}` (default `8081`).
-
-UI acceptance: [docs/UI.md](./docs/UI.md) checklists (Live + History complete).
-
-### Tests & quality
+## Development
 
 ```powershell
+# Windows
 .\sail.ps1 pest
 .\sail.ps1 pint
 .\sail.ps1 composer analyse
+.\sail.ps1 npm run dev
+```
+
+```bash
+# macOS / Linux / WSL
+./vendor/bin/sail pest
+./vendor/bin/sail pint
+./vendor/bin/sail composer analyse
+./vendor/bin/sail npm run dev
 ```
 
 CI runs Pint, Larastan level 5, and Pest against PostGIS on every push/PR.
 
-### Failure modes
-
-The app degrades gracefully when dependencies fail (full detail: [ARCHITECTURE.md §10](./docs/ARCHITECTURE.md)):
-
-| Failure | Behavior |
-|---------|----------|
-| USGS timeout / 5xx | Logged; ingest job soft-fails; next scheduled poll retries |
-| Malformed GeoJSON row | Skipped; batch continues |
-| Redis down | Horizon queues stall; public HTTP may still read PostGIS |
-| Reverb down | Map and Activity show DB state; live ripples pause until reconnect |
-| Partial backfill | Completion marker stays unset; auto-retry on next boot/tick |
-
-Horizon dashboard (`/horizon`) is available in **`local` environment only**.
+**Broadcast smoke test:** with the app up and assets built, open two browser tabs on `/`, then run `.\sail.ps1 artisan seismo:broadcast-test` (or `./vendor/bin/sail artisan seismo:broadcast-test`). Both consoles should log `[Seismo] EarthquakeDetected`.
 
 ---
 
-## Locked decisions (summary)
+## Documentation
 
-| Topic | Choice |
-|-------|--------|
-| Name / license | Seismo · MIT © Micha Schiess |
-| UI | Match [docs/UI.md](./docs/UI.md) + mockup |
-| Live presets | 1h 3h 6h 12h 24h 48h 7d (default 24h) |
-| Activity | 15/page; `Updates every 10s`; `Showing x–y of z` |
-| Default filter | Magnitude ≥ 2.5 |
-| Marker / list | Popup-only on marker; row click pans + popup |
-| Accent | ≈ `#E31A22` on dark charcoal |
-| Data / queues | USGS only, `raw` jsonb, Horizon, Sail local, CI in v1 |
+| Doc | Purpose |
+|-----|---------|
+| [docs/IDEA.md](./docs/IDEA.md) | Product intent & locked decisions |
+| [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) | Containers, ingest, schema, CI |
+| [docs/UI.md](./docs/UI.md) | Desktop UI spec (matches mockup) |
+| [docs/SPRINT.md](./docs/SPRINT.md) | Sprint plan 0–9 + as-built notes |
+| [docs/mockups/](./docs/mockups/) | Live mockup + architecture diagram |
 
 ---
 
