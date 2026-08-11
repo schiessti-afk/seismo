@@ -49,4 +49,10 @@ return [
     'map_locate' => 'Locate',
     'map_layers' => 'Layers',
     'history_range' => ':from — :to UTC',
+    'tsunami_banner' => 'USGS feed flag: one or more events in this view may have tsunami potential. Not an official warning.',
+    'tsunami_badge' => 'Tsunami',
+    'popup_tsunami' => 'Tsunami flag (USGS feed)',
+    'sound_on' => 'Sound on',
+    'sound_off' => 'Sound off',
+    'sound_toggle_aria' => 'Toggle alert sound for significant events',
 ];

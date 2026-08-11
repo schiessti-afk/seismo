@@ -19,7 +19,7 @@ No durations — each sprint ends when its **exit criteria** are met.
 | 5 | Live interactivity | Window presets, filters, WS ripples, popups, pagination | [SPRINT-5.md](./SPRINT-5.md) |
 | 6 | History mode | Time scrubber + slice queries in same shell | [SPRINT-6.md](./SPRINT-6.md) |
 | 7 | Hardening | Full Pest suite, CI green, i18n/times polish | [SPRINT-7.md](./SPRINT-7.md) |
-| 8 | Alerts polish | M5.0+ / tsunami emphasis, optional sound (roadmap v1.2) | — |
+| 8 | Alerts polish | M5.0+ / tsunami emphasis, optional sound (roadmap v1.2) | [SPRINT-8.md](./SPRINT-8.md) |
 | 9 | Exports | CSV / GeoJSON of stored data, rate-limited (roadmap v1.3) | — |
 
 Sprints **0–7** = v1.0 shippable public monitor. **8–9** = near-term roadmap. Multi-provider (v2.0) is out of this plan.
@@ -229,10 +229,10 @@ Stronger operator attention for significant events.
 
 ### Work
 
-- [ ] Stronger Activity + map treatment for M≥5.0
-- [ ] Tsunami banner/badge when `tsunami` true (feed flag, not external warning product)
-- [ ] Optional client sound toggle (default off); still no OS Notification API unless trivial
-- [ ] i18n strings for new chrome
+- [x] Stronger Activity + map treatment for M≥5.0
+- [x] Tsunami banner/badge when `tsunami` true (feed flag, not external warning product)
+- [x] Optional client sound toggle (default off); still no OS Notification API unless trivial
+- [x] i18n strings for new chrome
 
 ### Exit criteria
 

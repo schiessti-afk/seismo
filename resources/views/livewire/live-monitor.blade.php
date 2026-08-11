@@ -1,12 +1,14 @@
 <div
     class="seismo-shell"
     data-mode="{{ $mode }}"
+    data-alert-min-magnitude="{{ $alertMinMagnitude }}"
     @if ($mode === 'live') wire:poll.10s="refreshLive" @endif
     x-data="{
         filterOpen: false,
         windowOpen: false,
         scrubbing: false,
         debounceTimer: null,
+        soundEnabled: false,
         init() {
             const stored = localStorage.getItem('seismo.liveWindowHours');
             if (stored) {
@@ -23,6 +25,11 @@
             if (storedScrub) {
                 $wire.setScrubberAt(storedScrub);
             }
+            this.soundEnabled = localStorage.getItem('seismo.soundEnabled') === 'true';
+        },
+        toggleSound() {
+            this.soundEnabled = !this.soundEnabled;
+            localStorage.setItem('seismo.soundEnabled', this.soundEnabled ? 'true' : 'false');
         },
         onScrub(value) {
             this.scrubbing = true;
@@ -176,8 +183,31 @@
                     {{ $this->sliceChipLabel() }}
                 </span>
             @endif
+
+            @if ($mode === 'live')
+                <button
+                    type="button"
+                    class="seismo-chip seismo-chip--sound"
+                    @click="toggleSound()"
+                    :aria-pressed="soundEnabled"
+                    :aria-label="@js(__('seismo.sound_toggle_aria'))"
+                >
+                    <svg class="seismo-chip-icon" viewBox="0 0 16 16" aria-hidden="true">
+                        <path d="M3 5h2l3-2v10l-3-2H3V5z" fill="currentColor"/>
+                        <path d="M10 5.5a2.5 2.5 0 010 5" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/>
+                        <path x-show="!soundEnabled" x-cloak d="M12.5 4.5L9.5 11.5" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/>
+                    </svg>
+                    <span x-text="soundEnabled ? @js(__('seismo.sound_on')) : @js(__('seismo.sound_off'))"></span>
+                </button>
+            @endif
         </div>
     </header>
+
+    @if ($hasTsunamiInWindow)
+        <div class="seismo-tsunami-banner" role="status">
+            {{ __('seismo.tsunami_banner') }}
+        </div>
+    @endif
 
     <div class="seismo-main">
         <aside class="seismo-activity" aria-label="{{ __('seismo.activity_title') }}">
@@ -202,9 +232,17 @@
                             x-data
                             x-on:click="window.dispatchEvent(new CustomEvent('seismo-pan-to', { detail: { id: {{ $earthquake->id }} } }))"
                         >
-                            <span class="seismo-mag-badge">{{ number_format((float) $earthquake->magnitude, 1) }}</span>
+                            <span @class([
+                                'seismo-mag-badge',
+                                'seismo-mag-badge--strong' => (float) $earthquake->magnitude >= $alertMinMagnitude,
+                            ])>{{ number_format((float) $earthquake->magnitude, 1) }}</span>
                             <span class="seismo-activity-meta">
-                                <span class="seismo-activity-place">{{ $earthquake->place }}</span>
+                                <span class="seismo-activity-place-row">
+                                    <span class="seismo-activity-place">{{ $earthquake->place }}</span>
+                                    @if ($earthquake->tsunami)
+                                        <span class="seismo-tsunami-badge">{{ __('seismo.tsunami_badge') }}</span>
+                                    @endif
+                                </span>
                                 <span class="seismo-activity-date">
                                     <span x-text="new Date(@js($earthquake->occurred_at->toIso8601String())).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })"></span>
                                     <span x-text="new Date(@js($earthquake->occurred_at->toIso8601String())).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })"></span>
@@ -271,6 +309,7 @@
                 'close' => __('seismo.popup_close'),
                 'locate' => __('seismo.map_locate'),
                 'layers' => __('seismo.map_layers'),
+                'tsunami' => __('seismo.popup_tsunami'),
             ]) }}">@json($mapEvents)</script>
         </div>
     </div>

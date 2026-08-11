@@ -51,4 +51,6 @@ return [
 
     'default_filter_min_magnitude' => (float) env('SEISMO_DEFAULT_FILTER_MIN_MAGNITUDE', 2.5),
 
+    'alert_min_magnitude' => (float) env('SEISMO_ALERT_MIN_MAGNITUDE', 5.0),
+
 ];

@@ -26,6 +26,60 @@ function handleLivewireComponent() {
     return component;
 }
 
+function getAlertMinMagnitude() {
+    const shell = document.querySelector('.seismo-shell');
+    const value = parseFloat(shell?.dataset.alertMinMagnitude ?? '5');
+
+    return Number.isNaN(value) ? 5 : value;
+}
+
+function isLiveMode() {
+    const shell = document.querySelector('.seismo-shell');
+
+    return shell?.dataset.mode === 'live';
+}
+
+function shouldPlayAlertSound(payload) {
+    if (localStorage.getItem('seismo.soundEnabled') !== 'true') {
+        return false;
+    }
+
+    if (!isLiveMode()) {
+        return false;
+    }
+
+    const magnitude = payload.magnitude ?? 0;
+    const tsunami = Boolean(payload.tsunami);
+    const alertMin = getAlertMinMagnitude();
+
+    return magnitude >= alertMin || tsunami;
+}
+
+function playAlertTone() {
+    try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+
+        if (!AudioContext) {
+            return;
+        }
+
+        const ctx = new AudioContext();
+        const oscillator = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        oscillator.type = 'sine';
+        oscillator.connect(gain);
+        gain.connect(ctx.destination);
+        oscillator.frequency.value = 880;
+        gain.gain.setValueAtTime(0.12, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.45);
+        oscillator.start(ctx.currentTime);
+        oscillator.stop(ctx.currentTime + 0.45);
+    } catch {
+        // Web Audio unavailable
+    }
+}
+
 if (window.Echo) {
     window.Echo.channel('earthquakes')
         .listen('.EarthquakeDetected', (payload) => {
@@ -37,6 +91,10 @@ if (window.Echo) {
                 component.call('onLiveEarthquake', payload).then((matched) => {
                     if (!matched) {
                         return;
+                    }
+
+                    if (shouldPlayAlertSound(payload)) {
+                        playAlertTone();
                     }
                 });
             }

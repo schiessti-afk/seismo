@@ -9,10 +9,10 @@ function markerStyle(magnitude) {
     const mag = magnitude ?? 0;
 
     if (mag >= 6) {
-        return { radius: 14, fillOpacity: 0.95, color: '#FF3340', weight: 2, rings: [22, 30] };
+        return { radius: 14, fillOpacity: 0.98, color: '#FF3340', weight: 2.5, rings: [22, 30, 38] };
     }
     if (mag >= 5) {
-        return { radius: 11, fillOpacity: 0.9, color: '#F52835', weight: 2, rings: [18, 24] };
+        return { radius: 12, fillOpacity: 0.95, color: '#FF2838', weight: 2.5, rings: [18, 26, 34] };
     }
     if (mag >= 4) {
         return { radius: 8, fillOpacity: 0.85, color: '#E31A22', weight: 1.5, rings: [] };
@@ -47,12 +47,16 @@ function formatUtc(iso) {
 function popupHtml(event, labels) {
     const local = formatLocal(event.occurred_at);
     const mag = event.magnitude?.toFixed(1) ?? '—';
+    const tsunamiLine = event.tsunami
+        ? `<div class="seismo-popup-tsunami">${labels.tsunami ?? 'Tsunami'}</div>`
+        : '';
 
     return `
         <div class="seismo-popup">
             <button type="button" class="seismo-popup-close" aria-label="${labels.close}">&times;</button>
             <div class="seismo-popup-mag">${mag}</div>
             <div class="seismo-popup-place">${event.place ?? ''}</div>
+            ${tsunamiLine}
             <div class="seismo-popup-local">${local.date} ${local.time} ${labels.local}</div>
             <div class="seismo-popup-utc">${labels.utc} ${formatUtc(event.occurred_at)}</div>
         </div>
@@ -67,6 +71,7 @@ function normalizeEvent(event) {
         longitude: event.longitude ?? event.lon ?? null,
         place: event.place ?? null,
         occurred_at: event.occurred_at,
+        tsunami: Boolean(event.tsunami),
     };
 }
 

@@ -2,7 +2,7 @@
 
 Self-hosted real-time seismic monitoring: USGS GeoJSON → PostgreSQL/PostGIS → Laravel Horizon → Reverb WebSockets → public Livewire + Leaflet map.
 
-> **Status:** **v1.0** — Public Live/History monitor shipped. Horizon ingest, Reverb broadcasts (M≥2.5), filters, scrubber, full CI (Pint + Pest + Larastan). See [docs/SPRINT-7.md](./docs/SPRINT-7.md).
+> **Status:** **v1.2** — v1.0 Live/History monitor plus alert polish (M≥5.0 emphasis, tsunami banner, optional sound). See [docs/SPRINT-8.md](./docs/SPRINT-8.md).
 
 ---
 
@@ -21,6 +21,7 @@ Self-hosted real-time seismic monitoring: USGS GeoJSON → PostgreSQL/PostGIS �
 | [docs/SPRINT-5.md](./docs/SPRINT-5.md) | Sprint 5 as-built — Live interactivity |
 | [docs/SPRINT-6.md](./docs/SPRINT-6.md) | Sprint 6 as-built — History mode |
 | [docs/SPRINT-7.md](./docs/SPRINT-7.md) | Sprint 7 as-built — Hardening & v1.0 freeze |
+| [docs/SPRINT-8.md](./docs/SPRINT-8.md) | Sprint 8 as-built — Alerts polish (v1.2) |
 | [docs/mockups/seismo-desktop-mockup.png](./docs/mockups/seismo-desktop-mockup.png) | Canonical Live desktop mockup |
 | [docs/mockups/seismo-architecture.png](./docs/mockups/seismo-architecture.png) | Architecture flowchart graphic |
 

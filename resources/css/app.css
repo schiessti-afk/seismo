@@ -381,6 +381,46 @@ body {
     border-radius: 0.25rem;
 }
 
+.seismo-mag-badge--strong {
+    background: #ff2838;
+    box-shadow: 0 0 0 2px rgba(255, 40, 56, 0.35);
+    font-size: 0.9375rem;
+}
+
+.seismo-activity-place-row {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    min-width: 0;
+}
+
+.seismo-tsunami-badge {
+    flex-shrink: 0;
+    padding: 0.0625rem 0.375rem;
+    border: 1px solid rgba(255, 120, 80, 0.55);
+    border-radius: 0.125rem;
+    color: #ffb08a;
+    font-size: 0.625rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+}
+
+.seismo-tsunami-banner {
+    padding: 0.4375rem 1rem;
+    border-bottom: 1px solid rgba(255, 120, 80, 0.25);
+    background: rgba(255, 80, 40, 0.08);
+    color: #ffc9a8;
+    font-size: 0.75rem;
+    line-height: 1.35;
+    text-align: center;
+}
+
+.seismo-chip--sound[aria-pressed="true"] {
+    border-color: rgba(227, 26, 34, 0.55);
+    color: #fff;
+}
+
 .seismo-activity-meta {
     display: flex;
     flex-direction: column;
@@ -607,6 +647,15 @@ body {
     margin-top: 0.25rem;
     font-size: 0.875rem;
     font-weight: 500;
+}
+
+.seismo-popup-tsunami {
+    margin-top: 0.25rem;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: #ffb08a;
 }
 
 .seismo-popup-local {

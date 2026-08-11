@@ -219,7 +219,7 @@ class LiveMonitor extends Component
     }
 
     /**
-     * @return list<array{id: int, magnitude: float|null, latitude: float|null, longitude: float|null, place: string|null, occurred_at: string}>
+     * @return list<array{id: int, magnitude: float|null, latitude: float|null, longitude: float|null, place: string|null, occurred_at: string, tsunami: bool}>
      */
     public function mapEvents(): array
     {
@@ -232,6 +232,7 @@ class LiveMonitor extends Component
                 'longitude' => $earthquake->longitude,
                 'place' => $earthquake->place,
                 'occurred_at' => $earthquake->occurred_at->toIso8601String(),
+                'tsunami' => (bool) $earthquake->tsunami,
             ])
             ->all();
     }
@@ -342,12 +343,24 @@ class LiveMonitor extends Component
         return (int) config('seismo.history_slice_hours');
     }
 
+    public function alertMinMagnitude(): float
+    {
+        return (float) config('seismo.alert_min_magnitude');
+    }
+
+    public function hasTsunamiInWindow(): bool
+    {
+        return (clone $this->baseQuery())->where('tsunami', true)->exists();
+    }
+
     public function render(): View
     {
         return view('livewire.live-monitor', [
             'earthquakes' => $this->baseQuery()->paginate((int) config('seismo.list_page_size')),
             'presets' => config('seismo.live_window_presets', []),
             'mapEvents' => $this->mapEvents(),
+            'hasTsunamiInWindow' => $this->hasTsunamiInWindow(),
+            'alertMinMagnitude' => $this->alertMinMagnitude(),
             'scrubberMinTs' => $this->scrubberCenterMin()->timestamp,
             'scrubberMaxTs' => $this->scrubberCenterMax()->timestamp,
             'scrubberCenterTs' => $this->scrubberCenter()->timestamp,
@@ -388,6 +401,7 @@ class LiveMonitor extends Component
             'longitude' => isset($payload['lon']) ? (float) $payload['lon'] : (isset($payload['longitude']) ? (float) $payload['longitude'] : null),
             'place' => $payload['place'] ?? null,
             'occurred_at' => (string) ($payload['occurred_at'] ?? now()->toIso8601String()),
+            'tsunami' => (bool) ($payload['tsunami'] ?? false),
         ];
     }
 }

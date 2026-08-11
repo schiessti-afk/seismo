@@ -95,7 +95,22 @@ Header **Window** chip and bottom **Live Window** presets stay in sync.
 
 ---
 
-## 4. Copy & time rules
+## 4. Alert chrome (v1.2)
+
+Significant-event emphasis without changing the mockup shell layout.
+
+| Element | Spec |
+|---------|------|
+| M≥5.0 Activity badge | Same square badge; **strong** variant (brighter fill, subtle ring) when magnitude ≥ `SEISMO_ALERT_MIN_MAGNITUDE` (default 5.0) |
+| Tsunami row badge | Compact inline **Tsunami** label beside place when `tsunami` is true on that row |
+| Tsunami banner | Slim full-width strip **below top bar, above main** when ≥1 tsunami-flagged event is in the **current filtered** Live window or History slice; copy states USGS feed flag only — not an official warning |
+| Map M≥5 | Incremental emphasis on existing mag-scaled markers (stronger fill/rings); tsunami shown in popup only |
+| Sound toggle | Header chip (Live only): **Sound off** by default; persisted in `localStorage`; plays a short tone on Live WebSocket events that pass filters and are M≥5.0 **or** tsunami=true |
+| History | Same visual treatment + banner rules; **no sound** |
+
+---
+
+## 5. Copy & time rules
 
 - Locale: English via i18n keys; no hardcoded Blade strings.
 - Event times in list/popup: **browser local**, labeled `Local`.
@@ -103,7 +118,7 @@ Header **Window** chip and bottom **Live Window** presets stay in sync.
 
 ---
 
-## 5. Implementation checklist (accept Live UI)
+## 6. Implementation checklist (accept Live UI)
 
 - [x] Matches [mockups/seismo-desktop-mockup.png](./mockups/seismo-desktop-mockup.png) layout regions
 - [x] SEISMO + Live/History + two header chips
@@ -115,7 +130,17 @@ Header **Window** chip and bottom **Live Window** presets stay in sync.
 
 ---
 
-## 6. Implementation checklist (accept History UI)
+## 6.1 Implementation checklist (accept alert chrome v1.2)
+
+- [x] M≥5.0 strong Activity badge; tsunami row badge
+- [x] Window-scoped tsunami banner (filtered set)
+- [x] Map popup tsunami line; incremental M≥5 marker emphasis
+- [x] Live sound toggle default off; M≥5 or tsunami WS only
+- [x] i18n keys for banner, badges, sound
+
+---
+
+## 7. Implementation checklist (accept History UI)
 
 - [x] Mode pill toggles Live ↔ History without page reload
 - [x] History bottom bar: smooth-drag scrubber (no play/pause)
