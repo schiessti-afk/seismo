@@ -2,7 +2,7 @@
 
 Self-hosted real-time seismic monitoring: USGS GeoJSON → PostgreSQL/PostGIS → Laravel Horizon → Reverb WebSockets → public Livewire + Leaflet map.
 
-> **Status:** Sprint 0 complete — Sail stack boots with PostGIS, Redis, Horizon, scheduler, and Reverb. Product features land in later sprints.
+> **Status:** Sprint 1 complete — PostGIS `earthquakes` schema, `Earthquake` model with spatial/filter scopes, Pest coverage, and `seismo:backfill` stub. Ingest lands in Sprint 2.
 
 ---
 

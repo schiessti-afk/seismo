@@ -61,13 +61,13 @@ Persist earthquakes with spatial indexes and query scopes the UI/ingest will sha
 
 ### Work
 
-- [ ] Migration: `CREATE EXTENSION IF NOT EXISTS postgis`
-- [ ] `earthquakes` table per Architecture (`usgs_id` unique, `location` geography, `raw` jsonb required, timestamps, tsunami, etc.)
-- [ ] GiST index on `location`
-- [ ] Eloquent `Earthquake` model + casts/factories
-- [ ] Scopes: magnitude/depth/occurred/radius/tsunami/place/order
-- [ ] Pest tests for factory + at least one spatial scope against PostGIS in CI/Compose
-- [ ] Artisan `seismo:backfill` command stub (no HTTP yet) for ops surface
+- [x] Migration: `CREATE EXTENSION IF NOT EXISTS postgis`
+- [x] `earthquakes` table per Architecture (`usgs_id` unique, `location` geography, `raw` jsonb required, timestamps, tsunami, etc.)
+- [x] GiST index on `location`
+- [x] Eloquent `Earthquake` model + casts/factories
+- [x] Scopes: magnitude/depth/occurred/radius/tsunami/place/order
+- [x] Pest tests for factory + at least one spatial scope against PostGIS in CI/Compose
+- [x] Artisan `seismo:backfill` command stub (no HTTP yet) for ops surface
 
 ### Exit criteria
 
