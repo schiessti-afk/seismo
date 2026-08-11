@@ -75,6 +75,7 @@ it('broadcasts on live ingest of a new M>=2.5 event', function (): void {
         $payload = $event->broadcastWith();
 
         return $payload['usgs_id'] === 'us7000bcast1'
+            && $payload['id'] > 0
             && $payload['magnitude'] === 4.5
             && isset($payload['lat'], $payload['lon'], $payload['occurred_at']);
     });

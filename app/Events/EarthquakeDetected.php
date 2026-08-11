@@ -37,6 +37,7 @@ class EarthquakeDetected implements ShouldBroadcast
     public function broadcastWith(): array
     {
         return [
+            'id' => $this->earthquake->id,
             'usgs_id' => $this->earthquake->usgs_id,
             'magnitude' => $this->earthquake->magnitude !== null
                 ? (float) $this->earthquake->magnitude

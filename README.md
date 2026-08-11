@@ -2,7 +2,7 @@
 
 Self-hosted real-time seismic monitoring: USGS GeoJSON → PostgreSQL/PostGIS → Laravel Horizon → Reverb WebSockets → public Livewire + Leaflet map.
 
-> **Status:** Sprint 3 complete — `EarthquakeDetected` on public Reverb channel `earthquakes` for live M≥2.5 inserts/material changes; backfill stays silent; Echo smoke + Pest gate coverage. Live UI shell lands in Sprint 4.
+> **Status:** Sprint 5 complete — Live mode fully operational: filter panel, synced window chip + localStorage, Activity pagination, Echo ripples/prepends (respect filters), 10s poll refresh. History mode lands in Sprint 6.
 
 ---
 
@@ -14,6 +14,9 @@ Self-hosted real-time seismic monitoring: USGS GeoJSON → PostgreSQL/PostGIS �
 | [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) | Containers, ingest/backfill, schema, CI |
 | [docs/UI.md](./docs/UI.md) | **Desktop UI spec** (must match mockup) |
 | [docs/SPRINT.md](./docs/SPRINT.md) | Sprint plan (0–9) with exit criteria |
+| [docs/SPRINT-1.md](./docs/SPRINT-1.md) | Sprint 1 as-built — PostGIS + `Earthquake` |
+| [docs/SPRINT-2.md](./docs/SPRINT-2.md) | Sprint 2 as-built — USGS ingest & backfill |
+| [docs/SPRINT-3.md](./docs/SPRINT-3.md) | Sprint 3 as-built — Reverb broadcasts |
 | [docs/mockups/seismo-desktop-mockup.png](./docs/mockups/seismo-desktop-mockup.png) | Canonical Live desktop mockup |
 | [docs/mockups/seismo-architecture.png](./docs/mockups/seismo-architecture.png) | Architecture flowchart graphic |
 
@@ -119,7 +122,7 @@ Laravel Sail officially targets WSL2 on Windows; `sail.ps1` forwards to `docker 
 
 Supervisor inside the app container starts **web**, **Horizon**, **`schedule:work`**, and **Reverb** (container `:8080`, host `${REVERB_SERVER_PORT}`).
 
-Open `http://localhost` — you should see the SEISMO placeholder. Horizon (local only): `http://localhost/horizon`.
+Open `http://localhost` — you should see the Live monitor (SEISMO header, Activity sidebar, dark map). Horizon (local only): `http://localhost/horizon`.
 
 Default host port forwards (change in `.env` if occupied): app `80`, Vite `5173`, Reverb `8081`, Postgres `5433`, Redis `6380`.
 

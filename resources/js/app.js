@@ -1,14 +1,76 @@
 import './bootstrap';
+import 'leaflet/dist/leaflet.css';
+import {
+    initSeismoMap,
+    refreshSeismoMap,
+    panSeismoMapTo,
+    rippleSeismoMapEvent,
+    getSeismoMapCenter,
+} from './map';
 
-// Alpine.js is provided by Livewire (@livewireScripts). Keep alpinejs in
-// package.json for Vite tooling / future non-Livewire islands.
+window.SeismoMap = {
+    init: initSeismoMap,
+    refresh: refreshSeismoMap,
+    panTo: panSeismoMapTo,
+    ripple: rippleSeismoMapEvent,
+    getCenter: getSeismoMapCenter,
+};
+
+function handleLivewireComponent() {
+    const component = Livewire.first();
+
+    if (!component) {
+        return null;
+    }
+
+    return component;
+}
 
 if (window.Echo) {
     window.Echo.channel('earthquakes')
         .listen('.EarthquakeDetected', (payload) => {
-            console.info('[Seismo] EarthquakeDetected', payload);
             window.dispatchEvent(new CustomEvent('seismo:earthquake-detected', { detail: payload }));
-        });
 
-    console.info('[Seismo] Subscribed to public channel earthquakes');
+            const component = handleLivewireComponent();
+
+            if (component) {
+                component.call('onLiveEarthquake', payload).then((matched) => {
+                    if (!matched) {
+                        return;
+                    }
+                });
+            }
+        });
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+    const mapEl = document.getElementById('seismo-map');
+    const payloadEl = document.getElementById('seismo-map-data');
+
+    if (mapEl && payloadEl) {
+        const events = JSON.parse(payloadEl.textContent);
+        const labels = JSON.parse(payloadEl.dataset.labels ?? '{}');
+        initSeismoMap(mapEl, events, labels);
+    }
+});
+
+document.addEventListener('livewire:init', () => {
+    Livewire.on('seismo-map-refresh', ({ events }) => {
+        refreshSeismoMap(events);
+    });
+
+    Livewire.on('seismo-map-ripple', ({ mapEvent }) => {
+        rippleSeismoMapEvent(mapEvent);
+    });
+
+    Livewire.on('seismo-window-changed', ({ hours }) => {
+        localStorage.setItem('seismo.liveWindowHours', String(hours));
+    });
+});
+
+window.addEventListener('seismo-pan-to', (event) => {
+    const id = event.detail.id ?? event.detail[0]?.id;
+    if (id) {
+        panSeismoMapTo(id);
+    }
+});

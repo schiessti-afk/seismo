@@ -105,10 +105,10 @@ Header **Window** chip and bottom **Live Window** presets stay in sync.
 
 ## 5. Implementation checklist (accept Live UI)
 
-- [ ] Matches [mockups/seismo-desktop-mockup.png](./mockups/seismo-desktop-mockup.png) layout regions
-- [ ] SEISMO + Live/History + two header chips
-- [ ] Activity rows, 15/page, footer status + “Showing…”
-- [ ] Mag-scaled red markers + rings; popup fields as above
-- [ ] Map control stack + scale
-- [ ] Live Window presets exactly: 1h 3h 6h 12h 24h 48h 7d
-- [ ] Default mag ≥ 2.5 and window 24h
+- [x] Matches [mockups/seismo-desktop-mockup.png](./mockups/seismo-desktop-mockup.png) layout regions
+- [x] SEISMO + Live/History + two header chips
+- [x] Activity rows, 15/page, footer status + “Showing…”
+- [x] Mag-scaled red markers + rings; popup fields as above
+- [x] Map control stack + scale
+- [x] Live Window presets exactly: 1h 3h 6h 12h 24h 48h 7d
+- [x] Default mag ≥ 2.5 and window 24h

@@ -9,18 +9,18 @@ No durations — each sprint ends when its **exit criteria** are met.
 
 ## Overview
 
-| Sprint | Focus | Outcome |
-|--------|--------|---------|
-| 0 | Scaffold & repo | Runnable Sail stack, empty app shell, CI skeleton |
-| 1 | Data layer | PostGIS schema, `Earthquake` model, spatial/filter scopes |
-| 2 | Ingestion | Backfill + live poll via Horizon, idempotent upserts |
-| 3 | Realtime | Reverb broadcasts for M≥2.5 material changes |
-| 4 | Live UI shell | Desktop chrome matches mockup; map + Activity from DB |
-| 5 | Live interactivity | Window presets, filters, WS ripples, popups, pagination |
-| 6 | History mode | Time scrubber + slice queries in same shell |
-| 7 | Hardening | Full Pest suite, CI green, i18n/times polish |
-| 8 | Alerts polish | M5.0+ / tsunami emphasis, optional sound (roadmap v1.2) |
-| 9 | Exports | CSV / GeoJSON of stored data, rate-limited (roadmap v1.3) |
+| Sprint | Focus | Outcome | As-built |
+|--------|--------|---------|----------|
+| 0 | Scaffold & repo | Runnable Sail stack, empty app shell, CI skeleton | — |
+| 1 | Data layer | PostGIS schema, `Earthquake` model, spatial/filter scopes | [SPRINT-1.md](./SPRINT-1.md) |
+| 2 | Ingestion | Backfill + live poll via Horizon, idempotent upserts | [SPRINT-2.md](./SPRINT-2.md) |
+| 3 | Realtime | Reverb broadcasts for M≥2.5 material changes | [SPRINT-3.md](./SPRINT-3.md) |
+| 4 | Live UI shell | Desktop chrome matches mockup; map + Activity from DB | — |
+| 5 | Live interactivity | Window presets, filters, WS ripples, popups, pagination | — |
+| 6 | History mode | Time scrubber + slice queries in same shell | — |
+| 7 | Hardening | Full Pest suite, CI green, i18n/times polish | — |
+| 8 | Alerts polish | M5.0+ / tsunami emphasis, optional sound (roadmap v1.2) | — |
+| 9 | Exports | CSV / GeoJSON of stored data, rate-limited (roadmap v1.3) | — |
 
 Sprints **0–7** = v1.0 shippable public monitor. **8–9** = near-term roadmap. Multi-provider (v2.0) is out of this plan.
 
@@ -57,6 +57,8 @@ Bootstrap the Laravel application and engineering baseline so later sprints only
 
 ## Sprint 1 — Data layer (PostGIS + domain)
 
+> **Implementation:** [SPRINT-1.md](./SPRINT-1.md)
+
 Persist earthquakes with spatial indexes and query scopes the UI/ingest will share.
 
 ### Work
@@ -79,6 +81,8 @@ Persist earthquakes with spatial indexes and query scopes the UI/ingest will sha
 ---
 
 ## Sprint 2 — Ingestion & backfill
+
+> **Implementation:** [SPRINT-2.md](./SPRINT-2.md)
 
 Fill the database from USGS; never duplicate; recover from failed backfill.
 
@@ -103,6 +107,8 @@ Fill the database from USGS; never duplicate; recover from failed backfill.
 ---
 
 ## Sprint 3 — Realtime broadcasting
+
+> **Implementation:** [SPRINT-3.md](./SPRINT-3.md)
 
 Push live updates to browsers for qualifying events only.
 
@@ -130,15 +136,15 @@ Build the desktop composition so it looks like the canonical mockup, fed from DB
 
 ### Work
 
-- [ ] Dark + red theme tokens (accent ≈ `#E31A22`); CartoDB dark (or equivalent) tiles
-- [ ] Top bar: **SEISMO**, Live | History pill (History can be disabled/stub), Magnitude chip, Window chip
-- [ ] Left **Activity** list: mag square, place, Local time; page size 15; `Showing x–y of z`
-- [ ] Footer status copy `Updates every 10s` (UI)
-- [ ] World Leaflet map; mag-scaled circle markers (+ rings for higher M)
-- [ ] Map controls: zoom ±, locate, layers; scale bar
-- [ ] Bottom **Live Window** presets UI: `1h 3h 6h 12h 24h 48h 7d` (wiring can be partial if query uses default 24h)
-- [ ] Default filter mag ≥ 2.5; English via lang files
-- [ ] Compare against [UI.md](./UI.md) checklist / mockup
+- [x] Dark + red theme tokens (accent ≈ `#E31A22`); CartoDB dark (or equivalent) tiles
+- [x] Top bar: **SEISMO**, Live | History pill (History can be disabled/stub), Magnitude chip, Window chip
+- [x] Left **Activity** list: mag square, place, Local time; page size 15; `Showing x–y of z`
+- [x] Footer status copy `Updates every 10s` (UI)
+- [x] World Leaflet map; mag-scaled circle markers (+ rings for higher M)
+- [x] Map controls: zoom ±, locate, layers; scale bar
+- [x] Bottom **Live Window** presets UI: `1h 3h 6h 12h 24h 48h 7d` (wiring can be partial if query uses default 24h)
+- [x] Default filter mag ≥ 2.5; English via lang files
+- [x] Compare against [UI.md](./UI.md) checklist / mockup
 
 ### Exit criteria
 
@@ -155,14 +161,14 @@ Make Live mode fully operational: settings, filters, WebSockets, popups.
 
 ### Work
 
-- [ ] Sync header Window chip ↔ bottom Live Window presets; persist in `localStorage`
-- [ ] Query map/list by selected window; UTC range readout on bottom bar
-- [ ] Magnitude/filter control: min/max, depth, radius, tsunami, place (as per IDEA)
-- [ ] Marker click → popup only (large M, place, Local, small UTC, ×)
-- [ ] Activity row click → pan + open popup (no reverse list sync from marker)
-- [ ] Echo: on `EarthquakeDetected`, ripple marker + prepend Activity (respect filters)
-- [ ] Pagination for Activity (15/page)
-- [ ] Livewire/Pest smoke for filter + window changes
+- [x] Sync header Window chip ↔ bottom Live Window presets; persist in `localStorage`
+- [x] Query map/list by selected window; UTC range readout on bottom bar
+- [x] Magnitude/filter control: min/max, depth, radius, tsunami, place (as per IDEA)
+- [x] Marker click → popup only (large M, place, Local, small UTC, ×)
+- [x] Activity row click → pan + open popup (no reverse list sync from marker)
+- [x] Echo: on `EarthquakeDetected`, ripple marker + prepend Activity (respect filters)
+- [x] Pagination for Activity (15/page)
+- [x] Livewire/Pest smoke for filter + window changes
 
 ### Exit criteria
 

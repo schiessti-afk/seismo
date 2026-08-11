@@ -225,4 +225,13 @@ class Earthquake extends Model
     {
         $query->orderByDesc('occurred_at');
     }
+
+    /**
+     * @param  Builder<Earthquake>  $query
+     */
+    #[Scope]
+    protected function orderByMagnitudeDesc(Builder $query): void
+    {
+        $query->orderByDesc('magnitude');
+    }
 }
