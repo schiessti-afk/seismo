@@ -215,3 +215,159 @@ it('matches broadcast payloads against filters', function (): void {
         occurredTo: $to,
     ))->toBeFalse();
 });
+
+it('switches between live and history modes', function (): void {
+    Livewire::test(LiveMonitor::class)
+        ->assertSet('mode', 'live')
+        ->call('setMode', 'history')
+        ->assertSet('mode', 'history')
+        ->assertSee(__('seismo.status_idle'), false)
+        ->assertSee(__('seismo.slice_chip', ['hours' => 6]), false)
+        ->assertDispatched('seismo-mode-changed')
+        ->call('setMode', 'live')
+        ->assertSet('mode', 'live')
+        ->assertSee(__('seismo.updates_every'), false);
+});
+
+it('shows earthquakes within the history slice bounds', function (): void {
+    $sliceHours = (int) config('seismo.history_slice_hours');
+    $center = now()->subDays(5);
+    $scrubberAt = $center->toIso8601String();
+
+    Earthquake::factory()->create([
+        'usgs_id' => 'us7000inslice',
+        'magnitude' => 4.0,
+        'occurred_at' => $center,
+        'place' => 'Inside History Slice',
+    ]);
+
+    Earthquake::factory()->create([
+        'usgs_id' => 'us7000outside',
+        'magnitude' => 4.0,
+        'occurred_at' => $center->copy()->subHours($sliceHours + 2),
+        'place' => 'Outside History Slice',
+    ]);
+
+    Livewire::test(LiveMonitor::class)
+        ->call('setMode', 'history')
+        ->call('setScrubberAt', $scrubberAt)
+        ->assertSee('Inside History Slice', false)
+        ->assertDontSee('Outside History Slice', false);
+});
+
+it('updates history results when scrubber moves', function (): void {
+    $earlyCenter = now()->subDays(10);
+    $lateCenter = now()->subDays(2);
+
+    Earthquake::factory()->create([
+        'usgs_id' => 'us7000early',
+        'magnitude' => 4.0,
+        'occurred_at' => $earlyCenter,
+        'place' => 'Early History Event',
+    ]);
+
+    Earthquake::factory()->create([
+        'usgs_id' => 'us7000late',
+        'magnitude' => 4.0,
+        'occurred_at' => $lateCenter,
+        'place' => 'Late History Event',
+    ]);
+
+    Livewire::test(LiveMonitor::class)
+        ->call('setMode', 'history')
+        ->call('setScrubberAt', $earlyCenter->toIso8601String())
+        ->assertSee('Early History Event', false)
+        ->assertDontSee('Late History Event', false)
+        ->call('setScrubberAt', $lateCenter->toIso8601String())
+        ->assertSee('Late History Event', false)
+        ->assertDontSee('Early History Event', false);
+});
+
+it('applies filters in history mode', function (): void {
+    $center = now()->subDays(3);
+
+    Earthquake::factory()->create([
+        'usgs_id' => 'us7000histjapan',
+        'magnitude' => 4.0,
+        'occurred_at' => $center,
+        'place' => 'Near coast of Japan',
+    ]);
+
+    Earthquake::factory()->create([
+        'usgs_id' => 'us7000histcalif',
+        'magnitude' => 4.0,
+        'occurred_at' => $center,
+        'place' => 'Northern California',
+    ]);
+
+    Livewire::test(LiveMonitor::class)
+        ->call('setMode', 'history')
+        ->call('setScrubberAt', $center->toIso8601String())
+        ->set('place', 'Japan')
+        ->call('applyFilters')
+        ->assertSee('Near coast of Japan', false)
+        ->assertDontSee('Northern California', false);
+});
+
+it('increments pending live count in history mode without ripple', function (): void {
+    $earthquake = Earthquake::factory()->create([
+        'usgs_id' => 'us7000histws',
+        'magnitude' => 4.5,
+        'latitude' => 34.0,
+        'longitude' => -118.0,
+        'occurred_at' => now()->subMinutes(5),
+        'place' => 'Los Angeles, CA',
+    ]);
+
+    Livewire::test(LiveMonitor::class)
+        ->call('setMode', 'history')
+        ->call('onLiveEarthquake', [
+            'id' => $earthquake->id,
+            'usgs_id' => 'us7000histws',
+            'magnitude' => 4.5,
+            'lat' => 34.0,
+            'lon' => -118.0,
+            'depth_km' => 10.0,
+            'place' => 'Los Angeles, CA',
+            'occurred_at' => now()->subMinutes(5)->toIso8601String(),
+            'tsunami' => false,
+        ])
+        ->assertSet('pendingLiveCount', 1)
+        ->assertNotDispatched('seismo-map-ripple')
+        ->assertSee(__('seismo.new_live', ['count' => 1]), false);
+});
+
+it('clears pending count when returning to live via chip', function (): void {
+    Livewire::test(LiveMonitor::class)
+        ->call('setMode', 'history')
+        ->set('pendingLiveCount', 3)
+        ->call('goLiveFromChip')
+        ->assertSet('mode', 'live')
+        ->assertSet('pendingLiveCount', 0);
+});
+
+it('still dispatches ripple in live mode', function (): void {
+    $earthquake = Earthquake::factory()->create([
+        'usgs_id' => 'us7000livemode',
+        'magnitude' => 4.5,
+        'latitude' => 34.0,
+        'longitude' => -118.0,
+        'occurred_at' => now()->subMinutes(5),
+        'place' => 'Los Angeles, CA',
+    ]);
+
+    Livewire::test(LiveMonitor::class)
+        ->assertSet('mode', 'live')
+        ->call('onLiveEarthquake', [
+            'id' => $earthquake->id,
+            'usgs_id' => 'us7000livemode',
+            'magnitude' => 4.5,
+            'lat' => 34.0,
+            'lon' => -118.0,
+            'depth_km' => 10.0,
+            'place' => 'Los Angeles, CA',
+            'occurred_at' => now()->subMinutes(5)->toIso8601String(),
+            'tsunami' => false,
+        ])
+        ->assertDispatched('seismo-map-ripple');
+});

@@ -84,11 +84,23 @@ body {
 
 .seismo-mode {
     padding: 0.375rem 1rem;
+    border: none;
+    background: transparent;
+    color: var(--seismo-muted);
+    font-size: inherit;
+    font-weight: inherit;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
 }
 
 .seismo-mode--active {
     background: var(--seismo-accent);
     color: #fff;
+}
+
+.seismo-mode:not(.seismo-mode--active):hover {
+    color: var(--seismo-text);
 }
 
 .seismo-mode--disabled {
@@ -119,6 +131,11 @@ body {
 }
 
 .seismo-chip:disabled {
+    cursor: default;
+    opacity: 0.85;
+}
+
+.seismo-chip--disabled {
     cursor: default;
     opacity: 0.85;
 }
@@ -287,6 +304,26 @@ body {
     align-items: center;
     gap: 0.5rem;
     padding: 0.875rem 1rem 0.625rem;
+    flex-wrap: wrap;
+}
+
+.seismo-new-live-chip {
+    margin-left: auto;
+    padding: 0.25rem 0.625rem;
+    border: 1px solid var(--seismo-accent);
+    border-radius: 999px;
+    background: rgba(227, 26, 34, 0.12);
+    color: var(--seismo-accent);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.15s;
+}
+
+.seismo-new-live-chip:hover {
+    background: rgba(227, 26, 34, 0.22);
 }
 
 .seismo-activity-title {
@@ -642,6 +679,57 @@ body {
     background: var(--seismo-accent);
     border-color: var(--seismo-accent);
     color: #fff;
+}
+
+.seismo-bottom-left--history {
+    flex: 1;
+    min-width: 0;
+}
+
+.seismo-scrubber-label {
+    font-weight: 500;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.seismo-scrubber {
+    flex: 1;
+    min-width: 8rem;
+    max-width: 32rem;
+    height: 0.375rem;
+    appearance: none;
+    background: var(--seismo-border);
+    border-radius: 999px;
+    cursor: pointer;
+}
+
+.seismo-scrubber::-webkit-slider-thumb {
+    appearance: none;
+    width: 1rem;
+    height: 1rem;
+    border-radius: 50%;
+    background: var(--seismo-accent);
+    border: 2px solid #fff;
+    cursor: grab;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2);
+}
+
+.seismo-scrubber::-moz-range-thumb {
+    width: 1rem;
+    height: 1rem;
+    border-radius: 50%;
+    background: var(--seismo-accent);
+    border: 2px solid #fff;
+    cursor: grab;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2);
+}
+
+.seismo-scrubber:active::-webkit-slider-thumb {
+    cursor: grabbing;
+}
+
+.seismo-scrubber:active::-moz-range-thumb {
+    cursor: grabbing;
 }
 
 .seismo-bottom-right {

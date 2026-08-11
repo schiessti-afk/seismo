@@ -41,4 +41,11 @@ return [
     'filter_reset' => 'Reset',
     'pagination_prev' => 'Prev',
     'pagination_next' => 'Next',
+    'status_idle' => 'Idle',
+    'status_scrubbing' => 'Scrubbing…',
+    'new_live' => ':count new — Live',
+    'slice_chip' => 'Slice ±:hours h',
+    'scrubber_label' => 'Time',
+    'scrubber_aria' => 'History time scrubber',
+    'history_range' => ':from — :to UTC',
 ];

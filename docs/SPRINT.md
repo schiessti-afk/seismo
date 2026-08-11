@@ -16,8 +16,8 @@ No durations — each sprint ends when its **exit criteria** are met.
 | 2 | Ingestion | Backfill + live poll via Horizon, idempotent upserts | [SPRINT-2.md](./SPRINT-2.md) |
 | 3 | Realtime | Reverb broadcasts for M≥2.5 material changes | [SPRINT-3.md](./SPRINT-3.md) |
 | 4 | Live UI shell | Desktop chrome matches mockup; map + Activity from DB | — |
-| 5 | Live interactivity | Window presets, filters, WS ripples, popups, pagination | — |
-| 6 | History mode | Time scrubber + slice queries in same shell | — |
+| 5 | Live interactivity | Window presets, filters, WS ripples, popups, pagination | [SPRINT-5.md](./SPRINT-5.md) |
+| 6 | History mode | Time scrubber + slice queries in same shell | [SPRINT-6.md](./SPRINT-6.md) |
 | 7 | Hardening | Full Pest suite, CI green, i18n/times polish | — |
 | 8 | Alerts polish | M5.0+ / tsunami emphasis, optional sound (roadmap v1.2) | — |
 | 9 | Exports | CSV / GeoJSON of stored data, rate-limited (roadmap v1.3) | — |
@@ -185,11 +185,11 @@ Same shell; explore time with a scrubber.
 
 ### Work
 
-- [ ] Enable History in mode pill; swap bottom bar to smooth-drag scrubber (no play/pause)
-- [ ] Bind map + Activity to scrubber slice (± `SEISMO_HISTORY_SLICE_HOURS`, default 6) + filters
-- [ ] Do not append WS events to History map; optional “N new — Live” chip
-- [ ] History Activity pagination + appropriate status copy
-- [ ] Pest/Livewire coverage for slice query bounds
+- [x] Enable History in mode pill; swap bottom bar to smooth-drag scrubber (no play/pause)
+- [x] Bind map + Activity to scrubber slice (± `SEISMO_HISTORY_SLICE_HOURS`, default 6) + filters
+- [x] Do not append WS events to History map; optional “N new — Live” chip
+- [x] History Activity pagination + appropriate status copy
+- [x] Pest/Livewire coverage for slice query bounds
 
 ### Exit criteria
 

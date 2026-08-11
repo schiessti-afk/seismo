@@ -18,6 +18,12 @@ class LiveMonitor extends Component
 {
     use WithPagination;
 
+    public string $mode = 'live';
+
+    public string $scrubberAt;
+
+    public int $pendingLiveCount = 0;
+
     public int $windowHours;
 
     public float $minMagnitude;
@@ -44,6 +50,55 @@ class LiveMonitor extends Component
     {
         $this->windowHours = (int) config('seismo.live_window_hours');
         $this->minMagnitude = (float) config('seismo.default_filter_min_magnitude');
+        $this->scrubberAt = $this->defaultScrubberCenter()->toIso8601String();
+    }
+
+    public function setMode(string $mode): void
+    {
+        if (! in_array($mode, ['live', 'history'], true)) {
+            return;
+        }
+
+        $this->mode = $mode;
+
+        if ($mode === 'live') {
+            $this->pendingLiveCount = 0;
+        } else {
+            $this->scrubberAt = $this->defaultScrubberCenter()->toIso8601String();
+        }
+
+        $this->resetPage();
+        $this->dispatchMapRefresh();
+        $this->dispatch('seismo-mode-changed', mode: $mode);
+    }
+
+    public function setScrubberAt(string $iso): void
+    {
+        try {
+            $center = Carbon::parse($iso);
+        } catch (\Throwable) {
+            return;
+        }
+
+        $min = $this->scrubberCenterMin();
+        $max = $this->scrubberCenterMax();
+
+        if ($center->lt($min)) {
+            $center = $min;
+        } elseif ($center->gt($max)) {
+            $center = $max;
+        }
+
+        $this->scrubberAt = $center->toIso8601String();
+        $this->resetPage();
+        $this->dispatchMapRefresh();
+        $this->dispatch('seismo-scrubber-changed', at: $this->scrubberAt);
+    }
+
+    public function goLiveFromChip(): void
+    {
+        $this->pendingLiveCount = 0;
+        $this->setMode('live');
     }
 
     public function setWindowHours(int $hours): void
@@ -85,6 +140,10 @@ class LiveMonitor extends Component
 
     public function refreshLive(): void
     {
+        if ($this->mode !== 'live') {
+            return;
+        }
+
         $this->dispatchMapRefresh();
     }
 
@@ -94,6 +153,14 @@ class LiveMonitor extends Component
     public function onLiveEarthquake(array $payload): bool
     {
         $filters = app(ApplyEarthquakeFilters::class);
+
+        $occurredFrom = $this->mode === 'history'
+            ? now()->subHours($this->windowHours)
+            : $this->windowFrom();
+
+        $occurredTo = $this->mode === 'history'
+            ? now()
+            : $this->windowTo();
 
         if (! $filters->payloadMatches(
             $payload,
@@ -106,10 +173,16 @@ class LiveMonitor extends Component
             $this->radiusKm,
             $this->tsunami,
             $this->place !== '' ? $this->place : null,
-            $this->windowFrom(),
-            $this->windowTo(),
+            $occurredFrom,
+            $occurredTo,
         )) {
             return false;
+        }
+
+        if ($this->mode === 'history') {
+            $this->pendingLiveCount++;
+
+            return true;
         }
 
         $this->resetPage();
@@ -165,11 +238,25 @@ class LiveMonitor extends Component
 
     public function windowFrom(): Carbon
     {
+        if ($this->mode === 'history') {
+            $from = $this->scrubberCenter()->copy()->subHours($this->historySliceHours());
+            $trackMin = $this->historyTrackMin();
+
+            return $from->lt($trackMin) ? $trackMin : $from;
+        }
+
         return now()->subHours($this->windowHours);
     }
 
     public function windowTo(): Carbon
     {
+        if ($this->mode === 'history') {
+            $to = $this->scrubberCenter()->copy()->addHours($this->historySliceHours());
+            $trackMax = $this->historyTrackMax();
+
+            return $to->gt($trackMax) ? $trackMax : $to;
+        }
+
         return now();
     }
 
@@ -191,6 +278,11 @@ class LiveMonitor extends Component
         return __('seismo.window_chip_hours', ['hours' => $this->windowHours]);
     }
 
+    public function sliceChipLabel(): string
+    {
+        return __('seismo.slice_chip', ['hours' => $this->historySliceHours()]);
+    }
+
     public function magnitudeChipLabel(): string
     {
         if ($this->maxMagnitude !== null) {
@@ -203,13 +295,68 @@ class LiveMonitor extends Component
         return __('seismo.magnitude_chip', ['min' => $this->minMagnitude]);
     }
 
+    public function historyTrackMin(): Carbon
+    {
+        return now()->subDays(30);
+    }
+
+    public function historyTrackMax(): Carbon
+    {
+        return now();
+    }
+
+    public function scrubberCenterMin(): Carbon
+    {
+        return $this->historyTrackMin()->copy()->addHours($this->historySliceHours());
+    }
+
+    public function scrubberCenterMax(): Carbon
+    {
+        return $this->historyTrackMax()->copy()->subHours($this->historySliceHours());
+    }
+
+    public function scrubberCenter(): Carbon
+    {
+        try {
+            $center = Carbon::parse($this->scrubberAt);
+        } catch (\Throwable) {
+            $center = $this->defaultScrubberCenter();
+        }
+
+        $min = $this->scrubberCenterMin();
+        $max = $this->scrubberCenterMax();
+
+        if ($center->lt($min)) {
+            return $min;
+        }
+
+        if ($center->gt($max)) {
+            return $max;
+        }
+
+        return $center;
+    }
+
+    public function historySliceHours(): int
+    {
+        return (int) config('seismo.history_slice_hours');
+    }
+
     public function render(): View
     {
         return view('livewire.live-monitor', [
             'earthquakes' => $this->baseQuery()->paginate((int) config('seismo.list_page_size')),
             'presets' => config('seismo.live_window_presets', []),
             'mapEvents' => $this->mapEvents(),
+            'scrubberMinTs' => $this->scrubberCenterMin()->timestamp,
+            'scrubberMaxTs' => $this->scrubberCenterMax()->timestamp,
+            'scrubberCenterTs' => $this->scrubberCenter()->timestamp,
         ]);
+    }
+
+    private function defaultScrubberCenter(): Carbon
+    {
+        return now()->subHours($this->historySliceHours());
     }
 
     private function normalizeFilterInputs(): void

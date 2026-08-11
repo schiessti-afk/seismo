@@ -112,3 +112,14 @@ Header **Window** chip and bottom **Live Window** presets stay in sync.
 - [x] Map control stack + scale
 - [x] Live Window presets exactly: 1h 3h 6h 12h 24h 48h 7d
 - [x] Default mag ≥ 2.5 and window 24h
+
+---
+
+## 6. Implementation checklist (accept History UI)
+
+- [x] Mode pill toggles Live ↔ History without page reload
+- [x] History bottom bar: smooth-drag scrubber (no play/pause)
+- [x] Map + Activity bound to scrubber slice ± `SEISMO_HISTORY_SLICE_HOURS` + filters
+- [x] WS does not append to History map; “N new — Live” chip when events arrive
+- [x] History Activity pagination + Idle / Scrubbing status copy
+- [x] Window chip disabled in History; shows slice half-width label

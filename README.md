@@ -2,7 +2,7 @@
 
 Self-hosted real-time seismic monitoring: USGS GeoJSON → PostgreSQL/PostGIS → Laravel Horizon → Reverb WebSockets → public Livewire + Leaflet map.
 
-> **Status:** Sprint 5 complete — Live mode fully operational: filter panel, synced window chip + localStorage, Activity pagination, Echo ripples/prepends (respect filters), 10s poll refresh. History mode lands in Sprint 6.
+> **Status:** Sprint 6 complete — History mode: mode pill toggle, time scrubber (±6h slice), slice-bound map + Activity, “N new — Live” WS chip, localStorage persistence. Sprint 7 hardening next.
 
 ---
 
@@ -17,6 +17,9 @@ Self-hosted real-time seismic monitoring: USGS GeoJSON → PostgreSQL/PostGIS �
 | [docs/SPRINT-1.md](./docs/SPRINT-1.md) | Sprint 1 as-built — PostGIS + `Earthquake` |
 | [docs/SPRINT-2.md](./docs/SPRINT-2.md) | Sprint 2 as-built — USGS ingest & backfill |
 | [docs/SPRINT-3.md](./docs/SPRINT-3.md) | Sprint 3 as-built — Reverb broadcasts |
+| [docs/SPRINT-4.md](./docs/SPRINT-4.md) | Sprint 4 as-built — Live UI shell |
+| [docs/SPRINT-5.md](./docs/SPRINT-5.md) | Sprint 5 as-built — Live interactivity |
+| [docs/SPRINT-6.md](./docs/SPRINT-6.md) | Sprint 6 as-built — History mode |
 | [docs/mockups/seismo-desktop-mockup.png](./docs/mockups/seismo-desktop-mockup.png) | Canonical Live desktop mockup |
 | [docs/mockups/seismo-architecture.png](./docs/mockups/seismo-architecture.png) | Architecture flowchart graphic |
 

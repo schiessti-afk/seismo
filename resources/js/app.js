@@ -66,6 +66,14 @@ document.addEventListener('livewire:init', () => {
     Livewire.on('seismo-window-changed', ({ hours }) => {
         localStorage.setItem('seismo.liveWindowHours', String(hours));
     });
+
+    Livewire.on('seismo-mode-changed', ({ mode }) => {
+        localStorage.setItem('seismo.mode', mode);
+    });
+
+    Livewire.on('seismo-scrubber-changed', ({ at }) => {
+        localStorage.setItem('seismo.historyScrubAt', at);
+    });
 });
 
 window.addEventListener('seismo-pan-to', (event) => {

@@ -1,9 +1,12 @@
 <div
     class="seismo-shell"
-    wire:poll.10s="refreshLive"
+    data-mode="{{ $mode }}"
+    @if ($mode === 'live') wire:poll.10s="refreshLive" @endif
     x-data="{
         filterOpen: false,
         windowOpen: false,
+        scrubbing: false,
+        debounceTimer: null,
         init() {
             const stored = localStorage.getItem('seismo.liveWindowHours');
             if (stored) {
@@ -12,6 +15,22 @@
                     $wire.setWindowHours(hours);
                 }
             }
+            const storedMode = localStorage.getItem('seismo.mode');
+            if (storedMode === 'history' || storedMode === 'live') {
+                $wire.setMode(storedMode);
+            }
+            const storedScrub = localStorage.getItem('seismo.historyScrubAt');
+            if (storedScrub) {
+                $wire.setScrubberAt(storedScrub);
+            }
+        },
+        onScrub(value) {
+            this.scrubbing = true;
+            clearTimeout(this.debounceTimer);
+            this.debounceTimer = setTimeout(() => {
+                $wire.setScrubberAt(new Date(parseInt(value, 10) * 1000).toISOString());
+                this.scrubbing = false;
+            }, 150);
         }
     }"
     @click.outside="filterOpen = false; windowOpen = false"
@@ -20,8 +39,20 @@
         <h1 class="seismo-brand">{{ __('seismo.brand') }}</h1>
 
         <div class="seismo-mode-pill" role="group" aria-label="{{ __('seismo.mode_live') }} / {{ __('seismo.mode_history') }}">
-            <span class="seismo-mode seismo-mode--active">{{ __('seismo.mode_live') }}</span>
-            <span class="seismo-mode seismo-mode--disabled" aria-disabled="true">{{ __('seismo.mode_history') }}</span>
+            <button
+                type="button"
+                wire:click="setMode('live')"
+                @class(['seismo-mode', 'seismo-mode--active' => $mode === 'live'])
+            >
+                {{ __('seismo.mode_live') }}
+            </button>
+            <button
+                type="button"
+                wire:click="setMode('history')"
+                @class(['seismo-mode', 'seismo-mode--active' => $mode === 'history'])
+            >
+                {{ __('seismo.mode_history') }}
+            </button>
         </div>
 
         <div class="seismo-chips">
@@ -114,30 +145,37 @@
                 </div>
             </div>
 
-            <div class="seismo-chip-wrap">
-                <button
-                    type="button"
-                    class="seismo-chip"
-                    @click.stop="windowOpen = !windowOpen; filterOpen = false"
-                    :aria-expanded="windowOpen"
-                >
-                    <svg class="seismo-chip-icon" viewBox="0 0 16 16" aria-hidden="true"><rect x="2" y="3" width="12" height="11" rx="1" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M2 6h12M5 1v3M11 1v3" stroke="currentColor" stroke-width="1.5"/></svg>
-                    {{ $this->windowChipLabel() }}
-                </button>
+            @if ($mode === 'live')
+                <div class="seismo-chip-wrap">
+                    <button
+                        type="button"
+                        class="seismo-chip"
+                        @click.stop="windowOpen = !windowOpen; filterOpen = false"
+                        :aria-expanded="windowOpen"
+                    >
+                        <svg class="seismo-chip-icon" viewBox="0 0 16 16" aria-hidden="true"><rect x="2" y="3" width="12" height="11" rx="1" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M2 6h12M5 1v3M11 1v3" stroke="currentColor" stroke-width="1.5"/></svg>
+                        {{ $this->windowChipLabel() }}
+                    </button>
 
-                <div class="seismo-window-dropdown" x-show="windowOpen" x-cloak @click.stop>
-                    @foreach ($presets as $hours)
-                        <button
-                            type="button"
-                            wire:click="setWindowHours({{ $hours }})"
-                            @click="windowOpen = false"
-                            @class(['seismo-window-option', 'seismo-window-option--active' => $windowHours === $hours])
-                        >
-                            {{ $this->presetLabel($hours) }}
-                        </button>
-                    @endforeach
+                    <div class="seismo-window-dropdown" x-show="windowOpen" x-cloak @click.stop>
+                        @foreach ($presets as $hours)
+                            <button
+                                type="button"
+                                wire:click="setWindowHours({{ $hours }})"
+                                @click="windowOpen = false"
+                                @class(['seismo-window-option', 'seismo-window-option--active' => $windowHours === $hours])
+                            >
+                                {{ $this->presetLabel($hours) }}
+                            </button>
+                        @endforeach
+                    </div>
                 </div>
-            </div>
+            @else
+                <span class="seismo-chip seismo-chip--disabled" aria-disabled="true">
+                    <svg class="seismo-chip-icon" viewBox="0 0 16 16" aria-hidden="true"><rect x="2" y="3" width="12" height="11" rx="1" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M2 6h12M5 1v3M11 1v3" stroke="currentColor" stroke-width="1.5"/></svg>
+                    {{ $this->sliceChipLabel() }}
+                </span>
+            @endif
         </div>
     </header>
 
@@ -145,6 +183,11 @@
         <aside class="seismo-activity" aria-label="{{ __('seismo.activity_title') }}">
             <div class="seismo-activity-header">
                 <h2 class="seismo-activity-title">{{ __('seismo.activity_title') }}</h2>
+                @if ($mode === 'history' && $pendingLiveCount > 0)
+                    <button type="button" class="seismo-new-live-chip" wire:click="goLiveFromChip">
+                        {{ __('seismo.new_live', ['count' => $pendingLiveCount]) }}
+                    </button>
+                @endif
                 <svg class="seismo-pulse-icon" viewBox="0 0 24 12" aria-hidden="true">
                     <polyline points="0,6 4,6 6,2 8,10 10,6 14,6 16,1 18,11 20,6 24,6" fill="none" stroke="currentColor" stroke-width="1.5"/>
                 </svg>
@@ -181,7 +224,12 @@
             <footer class="seismo-activity-footer">
                 <span class="seismo-status">
                     <svg class="seismo-status-icon" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="2" fill="currentColor"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2" stroke="currentColor" stroke-width="1.5"/></svg>
-                    {{ __('seismo.updates_every') }}
+                    @if ($mode === 'live')
+                        {{ __('seismo.updates_every') }}
+                    @else
+                        <span x-show="!scrubbing">{{ __('seismo.status_idle') }}</span>
+                        <span x-show="scrubbing" x-cloak>{{ __('seismo.status_scrubbing') }}</span>
+                    @endif
                 </span>
                 <div class="seismo-activity-footer-right">
                     @if ($earthquakes->hasPages())
@@ -226,29 +274,55 @@
     </div>
 
     <footer class="seismo-bottombar">
-        <div class="seismo-bottom-left">
-            <svg class="seismo-clock-icon" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 4.5V8l2.5 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-            <span class="seismo-live-window-label">{{ __('seismo.live_window') }}</span>
-            <div class="seismo-presets" role="group" aria-label="{{ __('seismo.live_window') }}">
-                @foreach ($presets as $hours)
-                    <button
-                        type="button"
-                        wire:click="setWindowHours({{ $hours }})"
-                        @class(['seismo-preset', 'seismo-preset--active' => $windowHours === $hours])
-                    >
-                        {{ $this->presetLabel($hours) }}
-                    </button>
-                @endforeach
+        @if ($mode === 'live')
+            <div class="seismo-bottom-left">
+                <svg class="seismo-clock-icon" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 4.5V8l2.5 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                <span class="seismo-live-window-label">{{ __('seismo.live_window') }}</span>
+                <div class="seismo-presets" role="group" aria-label="{{ __('seismo.live_window') }}">
+                    @foreach ($presets as $hours)
+                        <button
+                            type="button"
+                            wire:click="setWindowHours({{ $hours }})"
+                            @class(['seismo-preset', 'seismo-preset--active' => $windowHours === $hours])
+                        >
+                            {{ $this->presetLabel($hours) }}
+                        </button>
+                    @endforeach
+                </div>
             </div>
-        </div>
-        <div class="seismo-bottom-right">
-            <svg class="seismo-chip-icon" viewBox="0 0 16 16" aria-hidden="true"><rect x="2" y="3" width="12" height="11" rx="1" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M2 6h12M5 1v3M11 1v3" stroke="currentColor" stroke-width="1.5"/></svg>
-            <span>
-                {{ __('seismo.window_range', [
-                    'from' => $this->windowFrom()->utc()->format('M j, Y H:i'),
-                    'to' => $this->windowTo()->utc()->format('M j, Y H:i'),
-                ]) }}
-            </span>
-        </div>
+            <div class="seismo-bottom-right">
+                <svg class="seismo-chip-icon" viewBox="0 0 16 16" aria-hidden="true"><rect x="2" y="3" width="12" height="11" rx="1" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M2 6h12M5 1v3M11 1v3" stroke="currentColor" stroke-width="1.5"/></svg>
+                <span>
+                    {{ __('seismo.window_range', [
+                        'from' => $this->windowFrom()->utc()->format('M j, Y H:i'),
+                        'to' => $this->windowTo()->utc()->format('M j, Y H:i'),
+                    ]) }}
+                </span>
+            </div>
+        @else
+            <div class="seismo-bottom-left seismo-bottom-left--history">
+                <svg class="seismo-clock-icon" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 4.5V8l2.5 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                <span class="seismo-scrubber-label">{{ __('seismo.scrubber_label') }}</span>
+                <input
+                    type="range"
+                    class="seismo-scrubber"
+                    min="{{ $scrubberMinTs }}"
+                    max="{{ $scrubberMaxTs }}"
+                    value="{{ $scrubberCenterTs }}"
+                    wire:key="scrubber-{{ $scrubberCenterTs }}"
+                    @input="onScrub($event.target.value)"
+                    aria-label="{{ __('seismo.scrubber_aria') }}"
+                >
+            </div>
+            <div class="seismo-bottom-right">
+                <svg class="seismo-chip-icon" viewBox="0 0 16 16" aria-hidden="true"><rect x="2" y="3" width="12" height="11" rx="1" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M2 6h12M5 1v3M11 1v3" stroke="currentColor" stroke-width="1.5"/></svg>
+                <span>
+                    {{ __('seismo.history_range', [
+                        'from' => $this->windowFrom()->utc()->format('M j, Y H:i'),
+                        'to' => $this->windowTo()->utc()->format('M j, Y H:i'),
+                    ]) }}
+                </span>
+            </div>
+        @endif
     </footer>
 </div>
